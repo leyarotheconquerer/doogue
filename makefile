@@ -1,19 +1,28 @@
-CC=g++
+CC=gcc
+CXX=g++
+RM=rm -f
+CPPFLAGS=-g
+LDFLAGS=-g
 LDLIBS=-lsfml-graphics -lsfml-window -lsfml-system
 
-all: ./build/gameoff
+SRCS=src/main.cpp
+OBJS=$(addprefix objs/,$(notdir $(SRCS:.cpp=.o)))
 
-./build/gameoff: ./build/objects/main.o
-	$(CC) -o ./build/gameoff ./build/objects/main.o $(LDLIBS)
+BUILD_TARGET=gameoff
 
-./build/objects/main.o: ./src/main.cpp
-	$(CC) -o ./build/objects/main.o -c ./src/main.cpp
+all: build/$(BUILD_TARGET)
 
-#%.o : %.cpp
-#	$(CC) -o $@ -c $<
+./build/$(BUILD_TARGET): $(OBJS)
+	@mkdir -p build
+	$(CXX) $(LDFLAGS) -o build/$(BUILD_TARGET) $(OBJS) $(LDLIBS)
+
+./objs/%.o: src/%.cpp
+	@mkdir -p objs
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ -c $<
 
 run:
-	./build/gameoff
+	build/$(BUILD_TARGET)
 
 clean:
-	rm -rf ./build/*
+	$(RM) $(OBJS)
+	$(RM) build/$(BUILD_TARGET)

@@ -1,5 +1,6 @@
 # Project Specifics
 build
+objs
 
 # Created by https://www.gitignore.io/api/emacs,c++
 

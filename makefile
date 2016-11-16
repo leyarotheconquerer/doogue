@@ -1,18 +1,15 @@
-#VPATH=src
 CC=g++
-
-#.SUFFIXES: .c .cpp .o
 
 all: ./build/gameoff
 
-yellowmellow:
-	@echo HEY MAN
+./build/gameoff: ./build/objects/main.o
+	$(CC) -o ./build/gameoff ./build/objects/main.o -lsfml-graphics -lsfml-window -lsfml-system
 
-./build/gameoff: ./build/objects/*
-	$(CC) -o ./build/gameoff ./build/objects/*
+./build/objects/main.o: ./src/main.cpp
+	$(CC) -o ./build/objects/main.o -c ./src/main.cpp
 
-%.o : %.cpp
-	$(CC) -c -o $@ $<
+#%.o : %.cpp
+#	$(CC) -c -o $@ $<
 
 run:
 	./build/gameoff

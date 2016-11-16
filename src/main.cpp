@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
       }
     }
 
-    if(buffer.str().length() > 0 && typingTimer.getElapsedTime().asSeconds() > 1.0f) {
+    if(buffer.str().length() > 0 && typingTimer.getElapsedTime().asSeconds() >= 0.5f) {
       cout << "Typed: " << buffer.str() << endl;
       buffer.str("");
     }

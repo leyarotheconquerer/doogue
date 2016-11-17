@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
 	// Cap player speed
 	// TODO: Replace with proper mathematical approach code
 	if(speed_magnitude > PLAYER_MAXSPEED) {
-	  player_speed = PLAYER_MAXSPEED*(player_speed/speed_magnitude)*deltaTime.asSeconds();
+	  player_speed = PLAYER_MAXSPEED*(player_speed/speed_magnitude);
 	}
 	
 	// Apply player speed

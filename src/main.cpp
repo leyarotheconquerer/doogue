@@ -7,9 +7,9 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-  stringstream buffer;
+  bool paused = false;
 
-  sf::Clock typingTimer;
+  sf::Clock gameClock;
   
   sf::RenderWindow window(sf::VideoMode(200, 200), "My Window", sf::Style::None);
   sf::CircleShape shape(100.0f);
@@ -26,26 +26,24 @@ int main(int argc, char* argv[])
 	break;
 
       case sf::Event::LostFocus:
-	cout << "Lost focus!" << endl;
+	paused = true;
+	cout << "Paused!" << endl;
 	break;
 
       case sf::Event::GainedFocus:
-	cout << "Gained focus!" << endl;
+	paused = false;
+	cout << "Resumed..." << endl;
 	break;
+    }
+      
+    // Game time!!
+    sf::Time deltaTime = gameClock.restart();
 
-      case sf::Event::TextEntered:
-	buffer << static_cast<char>(event.text.unicode);
-	typingTimer.restart();
-	
-	break;
-      }
+    if(!paused) {
+      // Game logic
     }
 
-    if(buffer.str().length() > 0 && typingTimer.getElapsedTime().asSeconds() >= 0.5f) {
-      cout << "Typed: " << buffer.str() << endl;
-      buffer.str("");
-    }
-
+    // Render game
     window.clear();
     window.draw(shape);
     window.display();

@@ -1,4 +1,21 @@
 # GitHub Game Off 2016
+A roguelike-inspired pick-up-and-play raycast game. The smaller details
+are not firmed up, but the core of the idea is to build a game that reflects
+the experience found in the original rogue, with the visuals of DOOM and Strife.
+The gameplay concept should be mostly exploritory, simple, and quick.
+
+### Example Concepts
+Ideas thrown into the pool as the core gets made
+
+ * Directory-based Generation
+ * Simple Rogue-like Generation
+ * NPCs to talk and sell, quests (?), etc
+ * Dungeon crawling
+ * Save states (Single/limited)
+ * Portable
+ * Broadcast-based local multiplayer (EXTENDED)
+
+## Original Readme
 
 ![GitHub Game Off 2016 Theme is Hacking, Modding, or Augmenting](https://cloud.githubusercontent.com/assets/121322/19498019/d8827370-9543-11e6-82d8-6da822b6147b.png)
 

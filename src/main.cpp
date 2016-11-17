@@ -94,6 +94,7 @@ int main(int argc, char* argv[])
 	
 	// Apply player speed
 	player_position += player_speed*deltaTime.asSeconds();
+	player_shape.setPosition(player_position);
       }
     }
 

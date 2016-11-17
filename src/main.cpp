@@ -12,8 +12,10 @@ int main(int argc, char* argv[])
   sf::Clock gameClock;
   
   sf::RenderWindow window(sf::VideoMode(200, 200), "My Window", sf::Style::None);
-  sf::CircleShape shape(100.0f);
-  shape.setFillColor(sf::Color::Green);
+
+  // Player Setup
+  sf::CircleShape player_shape(4.0f);
+  player_shape.setFillColor(sf::Color::Red);
 
   // Main window loop, while window is open
   while(window.isOpen()) {

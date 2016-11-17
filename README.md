@@ -11,6 +11,9 @@ Ideas thrown into the pool as the core gets made
  * Simple Rogue-like Generation
  * NPCs to talk and sell, quests (?), etc
  * Dungeon crawling
+ * Save states (Single/limited)
+ * Portable
+ * Broadcast-based local multiplayer (EXTENDED)
 
 ## Original Readme
 

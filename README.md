@@ -1,6 +1,4 @@
 # GitHub Game Off 2016
-
-## Project Details
 A roguelike-inspired pick-up-and-play raycast game. The smaller details
 are not firmed up, but the core of the idea is to build a game that reflects
 the experience found in the original rogue, with the visuals of DOOM and Strife.

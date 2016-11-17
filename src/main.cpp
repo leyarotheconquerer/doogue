@@ -94,8 +94,6 @@ int main(int argc, char* argv[])
 	
 	// Apply player speed
 	player_position += player_speed*deltaTime.asSeconds();
-
-	cout << player_position.x << ", " << player_position.y << ":" << player_speed.x << ", " << player_speed.y << endl;
       }
     }
 

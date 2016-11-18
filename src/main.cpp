@@ -107,6 +107,9 @@ int main(int argc, char* argv[])
 	player_position += player_speed*deltaTime.asSeconds();
 	player_shape.setPosition(player_position);
       }
+
+      // Player rotation
+      player_shape.setRotation(player_rotation);
     }
 
     // Render game

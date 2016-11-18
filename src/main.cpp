@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
   sf::RenderWindow window(sf::VideoMode(200, 200), "My Window", sf::Style::None);
 
   // Player Setup
+  float player_rotation = 0.0f;
   sf::Vector2f player_speed(0.0f, 0.0f);
   sf::Vector2f player_position(0.0f, 0.0f);
   sf::CircleShape player_shape(4.0f);
@@ -74,6 +75,14 @@ int main(int argc, char* argv[])
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
 	player_speed.x -= PLAYER_ACCEL*deltaTime.asSeconds();
+      }
+
+      if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+	player_rotation -= PLAYER_TURNRATE*deltaTime.asSeconds();
+      }
+
+      if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+	player_rotation += PLAYER_TURNRATE*deltaTime.asSeconds();
       }
 
       // Player physics

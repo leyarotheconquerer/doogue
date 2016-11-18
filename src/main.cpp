@@ -58,20 +58,21 @@ int main(int argc, char* argv[])
       // Game logic
 
       // Player input
+      sf::Vector2f frame_accel(0.0f, 0.0f);
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-	player_speed.y += PLAYER_ACCEL*deltaTime.asSeconds();
+	frame_accel.y += PLAYER_ACCEL*deltaTime.asSeconds();
       }
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-	player_speed.y -= PLAYER_ACCEL*deltaTime.asSeconds();
+	frame_accel.y -= PLAYER_ACCEL*deltaTime.asSeconds();
       }
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-	player_speed.x += PLAYER_ACCEL*deltaTime.asSeconds();
+	frame_accel.x += PLAYER_ACCEL*deltaTime.asSeconds();
       }
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-	player_speed.x -= PLAYER_ACCEL*deltaTime.asSeconds();
+	frame_accel.x -= PLAYER_ACCEL*deltaTime.asSeconds();
       }
 
       // Player physics
@@ -87,7 +88,6 @@ int main(int argc, char* argv[])
 	}
 
 	// Cap player speed
-	// TODO: Replace with proper mathematical approach code
 	if(speed_magnitude > PLAYER_MAXSPEED) {
 	  player_speed = PLAYER_MAXSPEED*(player_speed/speed_magnitude);
 	}

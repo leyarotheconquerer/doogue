@@ -9,6 +9,8 @@
 #define PLAYER_ACCEL 42.0f
 #define PLAYER_FRICTION 28.0f
 #define PLAYER_MAXSPEED 8.0f
+#define PLAYER_LOOK_SENSITIVITY 1.0f;
+#define PLAYER_TURNRATE 4.5f;
 
 using namespace std;
 

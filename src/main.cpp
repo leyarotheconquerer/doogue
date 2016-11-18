@@ -34,14 +34,12 @@ int main(int argc, char* argv[])
   sf::RenderWindow window(sf::VideoMode(200, 200), "My Window", sf::Style::None);
 
   // Map Setup
-  vector<sf::Vector2f[2]> map;
-
-  /*
-  map.push_back({sf::Vector2f(-5.0f, -5.0f), sf::Vector2f(-5.0f, 5.0f)});
-  map.push_back({sf::Vector2f(-5.0f, 5.0f), sf::Vector2f(5.0f, 5.0f)});
-  map.push_back({sf::Vector2f(5.0f, 5.0f), sf::Vector2f(5.0f, -5.0f)});
-  map.push_back({sf::Vector2f(5.0f, -5.0f), sf::Vector2f(-5.0f, -5.0f)});
-  //*/
+  vector<line> map;
+  
+  map.push_back(line(sf::Vector2f(-5.0f, -5.0f), sf::Vector2f(-5.0f, 5.0f)));
+  map.push_back(line(sf::Vector2f(-5.0f, 5.0f), sf::Vector2f(5.0f, 5.0f)));
+  map.push_back(line(sf::Vector2f(5.0f, 5.0f), sf::Vector2f(5.0f, -5.0f)));
+  map.push_back(line(sf::Vector2f(5.0f, -5.0f), sf::Vector2f(-5.0f, -5.0f)));
 
   // Player Setup
   sf::Vector2f player_speed(0.0f, 0.0f);

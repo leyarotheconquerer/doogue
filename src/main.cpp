@@ -11,6 +11,9 @@
 #define PLAYER_FRICTION 28.0f
 #define PLAYER_MAXSPEED 8.0f
 
+#define WINDOW_RESOLUTION_WIDTH 1024
+#define WINDOW_RESOLUTION_HEIGHT 768
+
 using namespace std;
 
 struct line {
@@ -31,7 +34,7 @@ int main(int argc, char* argv[])
 
   sf::Clock gameClock;
   
-  sf::RenderWindow window(sf::VideoMode(200, 200), "My Window", sf::Style::None);
+  sf::RenderWindow window(sf::VideoMode(WINDOW_RESOLUTION_WIDTH, WINDOW_RESOLUTION_HEIGHT), "My Window", sf::Style::None);
 
   // Map Setup
   vector<line> map;

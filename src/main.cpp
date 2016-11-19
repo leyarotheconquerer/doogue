@@ -14,6 +14,8 @@
 #define WINDOW_RESOLUTION_WIDTH 1024
 #define WINDOW_RESOLUTION_HEIGHT 768
 
+#define RAYCAST_FOV 60
+
 using namespace std;
 
 struct line {
@@ -121,6 +123,16 @@ int main(int argc, char* argv[])
     // Render game
     window.clear();
     window.draw(player_shape);
+
+    float slice_width = (float)RAYCAST_FOV/WINDOW_RESOLUTION_WIDTH;
+    for(int slice = 0; slice < WINDOW_RESOLUTION_WIDTH; ++slice) {
+      for(auto& wall : map) {
+	sf::Vertex line[] = { sf::Vertex(scale*(wall.first + offset)), sf::Vertex(scale*(wall.second + offset))  };
+	
+	window.draw(line, 2, sf::Lines);
+      }
+    }
+    
     window.display();
   }
   

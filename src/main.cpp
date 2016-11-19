@@ -18,6 +18,7 @@
 #define WINDOW_RESOLUTION_HEIGHT 768
 
 #define RAYCAST_FOV 60
+#define RAYCAST_VIEWDISTANCE 25.0f
 
 using namespace std;
 
@@ -127,12 +128,23 @@ int main(int argc, char* argv[])
     window.clear();
     window.draw(player_shape);
 
+    // Raycast walls
     float slice_width = (float)RAYCAST_FOV/WINDOW_RESOLUTION_WIDTH;
+    
     for(int slice = 0; slice < WINDOW_RESOLUTION_WIDTH; ++slice) {
+      float slice_angle = slice_width*slice;
+      float distance = -1.0f;
+
       for(auto& wall : map) {
 	sf::Vertex line[] = { sf::Vertex(scale*(wall.first + offset)), sf::Vertex(scale*(wall.second + offset))  };
 	
 	window.draw(line, 2, sf::Lines);
+      }
+
+      // Draw wall
+      if(distance >= 0.0f) {
+	float height = distance
+	window.draw(
       }
     }
     

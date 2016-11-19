@@ -20,9 +20,8 @@ struct line {
   sf::Vector2f first;
   sf::Vector2f second;
 
-  line(sf::Vector2f first_init, sf::Vector2f second_init): first(first_init), second(second_init)
-    {
-    }
+  line(sf::Vector2f first_init, sf::Vector2f second_init):
+    first(first_init), second(second_init) {}
 };
 
 float magnitude(sf::Vector2f vector);

@@ -32,6 +32,7 @@ struct line {
 
 float magnitude(sf::Vector2f vector);
 float sqrMagnitude(sf::Vector2f vector);
+bool findIntersection(const line a, const line b, sf::Vector2f* intersection);
 bool findIntersection(const sf::Vector2f a_first, const sf::Vector2f a_second, const sf::Vector2f b_first, const sf::Vector2f b_second, sf::Vector2f* intersection);
 
 int main(int argc, char* argv[])
@@ -173,6 +174,10 @@ float magnitude(sf::Vector2f vector)
 float sqrMagnitude(sf::Vector2f vector)
 {
   return vector.x*vector.x + vector.y*vector.y;
+}
+
+bool findIntersection(const line a, const line b, sf::Vector2f* intersection = NULL) {
+  return findIntersection(a.first, a.second, b.first, b.second, intersection);
 }
 
 bool findIntersection(const sf::Vector2f a_first, const sf::Vector2f a_second, const sf::Vector2f b_first, const sf::Vector2f b_second, sf::Vector2f* intersection = NULL) {

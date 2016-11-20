@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
 	
 	// Apply player speed
 	player_position += player_speed*deltaTime.asSeconds();
-	player_shape.setPosition(player_position);
+	player_shape.setPosition(player_position - (player_shape.getRadius() + player_shape.getOutlineThickness())*sf::Vector2f(1.0f, 1.0f));
       }
     }
 

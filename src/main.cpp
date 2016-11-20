@@ -130,23 +130,33 @@ int main(int argc, char* argv[])
 
     // Raycast walls
     float slice_width = (float)RAYCAST_FOV/WINDOW_RESOLUTION_WIDTH;
-    
+    vector<sf::Vertex> slice_points(WINDOW_RESOLUTION_WIDTH);
+
+    //*
     for(int slice = 0; slice < WINDOW_RESOLUTION_WIDTH; ++slice) {
       float slice_angle = slice_width*slice;
       float distance = -1.0f;
 
+      sf::Vector2f slice_target(RAYCAST_VIEWDISTANCE*sin(DEG_TO_RAD*slice_angle), RAYCAST_VIEWDISTANCE*cos(DEG_TO_RAD*slice_angle));
+      slice_target = player_position + slice_target;
+      
       for(auto& wall : map) {
-	sf::Vertex line[] = { sf::Vertex(scale*(wall.first + offset)), sf::Vertex(scale*(wall.second + offset))  };
-	
-	window.draw(line, 2, sf::Lines);
+
       }
 
       // Draw wall
       if(distance >= 0.0f) {
-	float height = distance
-	window.draw(
+	float height = distance;
+	sf::Vertex line[] = { sf::Vertex(slice, -(int)(height/2.0f)), sf::Vertex(slice, (int)(height/2.0f)) };
+	
+	window.draw(line, 2, sf::Lines);
       }
+
+      slice_points[slice] = sf::Vertex(slice_target);
     }
+    //*/
+
+    window.draw(slice_points, 8, sf::Lines);
     
     window.display();
   }

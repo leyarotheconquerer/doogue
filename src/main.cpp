@@ -32,6 +32,7 @@ struct line {
 
 float magnitude(sf::Vector2f vector);
 float sqrMagnitude(sf::Vector2f vector);
+bool findIntersection(const sf::Vector2f a_first, const sf::Vector2f a_second, const sf::Vector2f b_first, const sf::Vector2f b_second, sf::Vector2f* intersection);
 
 int main(int argc, char* argv[])
 {
@@ -172,4 +173,31 @@ float magnitude(sf::Vector2f vector)
 float sqrMagnitude(sf::Vector2f vector)
 {
   return vector.x*vector.x + vector.y*vector.y;
+}
+
+bool findIntersection(const sf::Vector2f a_first, const sf::Vector2f a_second, const sf::Vector2f b_first, const sf::Vector2f b_second, sf::Vector2f* intersection = NULL) {
+  sf::Vector2f segment_a = a_second - a_first;
+  sf::Vector2f segment_b = b_second - b_first;
+
+  float s, t;
+  float denominator = (-segment_b.x*segment_a.y + segment_a.x*segment_b.y);
+
+  if(denominator != 0.0f) {
+    s = (-segment_a.y*(a_first.x - b_first.x) + segment_a.x*(a_first.y - b_first.y))/denominator;
+    t = ( segment_b.x*(a_first.y - b_first.y) - segment_b.y*(a_first.x - b_first.x))/denominator;
+
+    // Test for intersection
+    if(s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+      if(intersection != NULL) {
+	intersection->x = a_first.x + (t*segment_a.x);
+	intersection->y = a_first.y + (t*segment_a.y);
+      }
+      
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
 }

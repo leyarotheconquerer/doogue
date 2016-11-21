@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
       mouse_previous = mouse_current;
 
       if(mouse_locked) {
-	sf::Mouse::setPosition(sf::Vector2i(100, 100), window);
+	sf::Mouse::setPosition(sf::Vector2i(WINDOW_RESOLUTION_WIDTH/2, WINDOW_RESOLUTION_HEIGHT/2), window);
       }
 
       player_rotation += PLAYER_LOOK_SENSITIVITY*mouse_delta.x*deltaTime.asSeconds();

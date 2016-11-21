@@ -156,18 +156,13 @@ int main(int argc, char* argv[])
       // Draw wall
       if(sqr_distance >= 0.0f) {
 	float distance = sqrt(sqr_distance);
-	float height = RAYCAST_WALLHEIGHT/(distance < 1.0 ? 1.0f : distance);
+	float height = WINDOW_RESOLUTION_HEIGHT/(distance < 0.05f ? 0.05f : distance);
 
-	float start = 0.0f;
-	float end = WINDOW_RESOLUTION_HEIGHT;
+	float start = -height/2+WINDOW_RESOLUTION_HEIGHT/2;
+	float end = height/2+WINDOW_RESOLUTION_HEIGHT/2;
 
-	if(height < WINDOW_RESOLUTION_HEIGHT) {
-	  start = WINDOW_RESOLUTION_HEIGHT - height;
-	  end = start + height;
-	}
-
-	slice_points[2*slice] = sf::Vertex(sf::Vector2f(slice/2, start));
-	slice_points[2*slice + 1] = sf::Vertex(sf::Vector2f(slice/2, end));
+	slice_points[2*slice] = sf::Vertex(sf::Vector2f(slice, start));
+	slice_points[2*slice + 1] = sf::Vertex(sf::Vector2f(slice, end));
       }
     }
     //*/

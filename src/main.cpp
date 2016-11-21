@@ -9,8 +9,8 @@
 #define PLAYER_ACCEL 42.0f
 #define PLAYER_FRICTION 28.0f
 #define PLAYER_MAXSPEED 8.0f
-#define PLAYER_LOOK_SENSITIVITY 1.0f;
-#define PLAYER_TURNRATE 4.5f;
+#define PLAYER_LOOK_SENSITIVITY 1.0f
+#define PLAYER_TURNRATE 4.5f
 
 using namespace std;
 
@@ -20,6 +20,7 @@ float sqrMagnitude(sf::Vector2f vector);
 int main(int argc, char* argv[])
 {
   bool paused = false;
+  bool mouse_locked = true;
 
   sf::Clock gameClock;
   
@@ -32,12 +33,22 @@ int main(int argc, char* argv[])
   sf::CircleShape player_shape(4.0f);
   player_shape.setFillColor(sf::Color::Red);
 
+  // Mouse Position
+  sf::Vector2f mouse_previous;
+
   // Main window loop, while window is open
   while(window.isOpen()) {
     sf::Event event;
 
     while(window.pollEvent(event)) {
       switch(event.type) {
+      case sf::Event::KeyReleased:
+	if(event.key.code == sf::Keyboard::L) {
+	  mouse_locked = !mouse_locked;
+	}
+	
+	break;
+	
       case sf::Event::Closed:
 	window.close();
 	break;
@@ -84,6 +95,19 @@ int main(int argc, char* argv[])
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
 	player_rotation += PLAYER_TURNRATE*deltaTime.asSeconds();
       }
+
+      // Mouse movement
+      sf::Vector2f mouse_current((float)sf::Mouse::getPosition().x, (float)sf::Mouse::getPosition().y);
+      sf::Vector2f mouse_delta = mouse_current - mouse_previous;
+      mouse_previous = mouse_current;
+
+      if(mouse_locked) {
+	sf::Mouse::setPosition(sf::Vector2i(100, 100), window);
+      }
+
+      player_rotation += PLAYER_LOOK_SENSITIVITY*mouse_delta.x*deltaTime.asSeconds();
+
+      cout << "Rotation: " << player_rotation << endl;
 
       // Player physics
       if(sqrMagnitude(player_speed) > 0.0f) {

@@ -19,6 +19,7 @@
 
 #define RAYCAST_FOV 60
 #define RAYCAST_VIEWDISTANCE 25.0f
+#define RAYCAST_WALLHEIGHT 10.0f
 
 using namespace std;
 
@@ -132,33 +133,47 @@ int main(int argc, char* argv[])
 
     // Raycast walls
     float slice_width = (float)RAYCAST_FOV/WINDOW_RESOLUTION_WIDTH;
-    vector<sf::Vertex> slice_points(WINDOW_RESOLUTION_WIDTH);
+    vector<sf::Vertex> slice_points(2*WINDOW_RESOLUTION_WIDTH);
 
     //*
     for(int slice = 0; slice < WINDOW_RESOLUTION_WIDTH; ++slice) {
       float slice_angle = slice_width*slice;
-      float distance = -1.0f;
+      float sqr_distance = -1.0f;
 
+      sf::Vector2f intersection;
       sf::Vector2f slice_target(RAYCAST_VIEWDISTANCE*sin(DEG_TO_RAD*slice_angle), RAYCAST_VIEWDISTANCE*cos(DEG_TO_RAD*slice_angle));
-      slice_target = player_position + slice_target;
+      line slice_segment(player_position, player_position + slice_target);
       
       for(auto& wall : map) {
-
+	if(findIntersection(slice_segment, wall, &intersection)) {
+	  float intersection_distance = sqrMagnitude(intersection - player_position);
+	  
+	  if(sqr_distance < 0.0f || intersection_distance < sqr_distance) {
+	    sqr_distance = intersection_distance;
+	  }
+	}
       }
 
       // Draw wall
-      if(distance >= 0.0f) {
-	float height = distance;
-	sf::Vertex line[] = { sf::Vertex(slice, -(int)(height/2.0f)), sf::Vertex(slice, (int)(height/2.0f)) };
-	
-	window.draw(line, 2, sf::Lines);
-      }
+      if(sqr_distance >= 0.0f) {
+	float distance = sqrt(sqr_distance);
+	float height = RAYCAST_WALLHEIGHT/(distance < 1.0 ? 1.0f : distance);
 
-      slice_points[slice] = sf::Vertex(slice_target);
+	float start = 0.0f;
+	float end = WINDOW_RESOLUTION_HEIGHT;
+
+	if(height < WINDOW_RESOLUTION_HEIGHT) {
+	  start = WINDOW_RESOLUTION_HEIGHT - height;
+	  end = start + height;
+	}
+
+	slice_points[2*slice] = sf::Vertex(sf::Vector2f(slice/2, start));
+	slice_points[2*slice + 1] = sf::Vertex(sf::Vector2f(slice/2, end));
+      }
     }
     //*/
 
-    window.draw(slice_points, 8, sf::Lines);
+    window.draw(&slice_points[0], 2*WINDOW_RESOLUTION_WIDTH, sf::Lines);
     
     window.display();
   }

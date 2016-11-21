@@ -173,7 +173,7 @@ int main(int argc, char* argv[])
 
     //*
     for(int slice = 0; slice < WINDOW_RESOLUTION_WIDTH; ++slice) {
-      float slice_angle = slice_width*slice;
+      float slice_angle = player_rotation + slice_width*slice;
       float sqr_distance = -1.0f;
 
       sf::Vector2f intersection;

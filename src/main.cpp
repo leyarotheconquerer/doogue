@@ -127,6 +127,9 @@ int main(int argc, char* argv[])
       }
     }
 
+    // Print player position and rotation for debugging
+    cout << player_position.x << ", " << player_position.y << endl;
+
     // Render game
     window.clear();
     window.draw(player_shape);

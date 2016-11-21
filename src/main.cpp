@@ -13,6 +13,8 @@
 #define PLAYER_ACCEL 42.0f
 #define PLAYER_FRICTION 28.0f
 #define PLAYER_MAXSPEED 8.0f
+#define PLAYER_LOOK_SENSITIVITY 1.0f
+#define PLAYER_TURNRATE 4.5f
 
 #define WINDOW_RESOLUTION_WIDTH 1024
 #define WINDOW_RESOLUTION_HEIGHT 768
@@ -38,6 +40,7 @@ bool findIntersection(const sf::Vector2f a_first, const sf::Vector2f a_second, c
 int main(int argc, char* argv[])
 {
   bool paused = false;
+  bool mouse_locked = true;
 
   sf::Clock gameClock;
   
@@ -52,10 +55,14 @@ int main(int argc, char* argv[])
   map.push_back(line(sf::Vector2f(5.0f, -5.0f), sf::Vector2f(-5.0f, -5.0f)));
 
   // Player Setup
+  float player_rotation = 0.0f;
   sf::Vector2f player_speed(0.0f, 0.0f);
   sf::Vector2f player_position(0.0f, 0.0f);
   sf::CircleShape player_shape(4.0f);
   player_shape.setFillColor(sf::Color::Red);
+
+  // Mouse Position
+  sf::Vector2f mouse_previous;
 
   // Main window loop, while window is open
   while(window.isOpen()) {
@@ -63,6 +70,13 @@ int main(int argc, char* argv[])
 
     while(window.pollEvent(event)) {
       switch(event.type) {
+      case sf::Event::KeyReleased:
+	if(event.key.code == sf::Keyboard::L) {
+	  mouse_locked = !mouse_locked;
+	}
+	
+	break;
+	
       case sf::Event::Closed:
 	window.close();
 	break;
@@ -102,6 +116,27 @@ int main(int argc, char* argv[])
 	player_speed.x -= PLAYER_ACCEL*deltaTime.asSeconds();
       }
 
+      if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+	player_rotation -= PLAYER_TURNRATE*deltaTime.asSeconds();
+      }
+
+      if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+	player_rotation += PLAYER_TURNRATE*deltaTime.asSeconds();
+      }
+
+      // Mouse movement
+      sf::Vector2f mouse_current((float)sf::Mouse::getPosition().x, (float)sf::Mouse::getPosition().y);
+      sf::Vector2f mouse_delta = mouse_current - mouse_previous;
+      mouse_previous = mouse_current;
+
+      if(mouse_locked) {
+	sf::Mouse::setPosition(sf::Vector2i(100, 100), window);
+      }
+
+      player_rotation += PLAYER_LOOK_SENSITIVITY*mouse_delta.x*deltaTime.asSeconds();
+
+      cout << "Rotation: " << player_rotation << endl;
+
       // Player physics
       if(sqrMagnitude(player_speed) > 0.0f) {
 	float speed_magnitude = magnitude(player_speed);
@@ -123,6 +158,9 @@ int main(int argc, char* argv[])
 	// Apply player speed
 	player_position += player_speed*deltaTime.asSeconds();
       }
+
+      // Player rotation
+      player_shape.setRotation(player_rotation);
     }
 
     // Render game

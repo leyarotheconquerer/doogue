@@ -19,7 +19,6 @@
 
 #define RAYCAST_FOV 60
 #define RAYCAST_VIEWDISTANCE 25.0f
-#define RAYCAST_WALLHEIGHT 10.0f
 
 using namespace std;
 

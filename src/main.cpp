@@ -25,6 +25,15 @@
 
 using namespace std;
 
+struct entity {
+  sf::Vector2f position;
+  sf::Vector2f direction;
+  sf::Vector2f velocity;
+
+  entity(sf::Vector2f start_position, sf::Vector2f start_direction):
+    position(start_position), direction(start_direction) {}
+};
+
 struct line {
   sf::Vector2f first;
   sf::Vector2f second;

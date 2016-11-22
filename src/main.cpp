@@ -86,9 +86,7 @@ int main(int argc, char* argv[])
   map.push_back(line(sf::Vector2f(5.0f, -5.0f), sf::Vector2f(-5.0f, -5.0f)));
 
   // Player Setup
-  float player_rotation = 0.0f;
-  sf::Vector2f player_speed(0.0f, 0.0f);
-  sf::Vector2f player_position(0.0f, 0.0f);
+  entity player(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(0.0f, 1.0f));
   sf::CircleShape player_shape(4.0f);
   player_shape.setFillColor(sf::Color::Red);
 
@@ -132,27 +130,27 @@ int main(int argc, char* argv[])
 
       // Player input
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-	player_speed.y += PLAYER_ACCEL*deltaTime.asSeconds();
+	player.velocity.y += PLAYER_ACCEL*deltaTime.asSeconds();
       }
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-	player_speed.y -= PLAYER_ACCEL*deltaTime.asSeconds();
+	player.velocity.y -= PLAYER_ACCEL*deltaTime.asSeconds();
       }
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-	player_speed.x += PLAYER_ACCEL*deltaTime.asSeconds();
+	player.velocity.x += PLAYER_ACCEL*deltaTime.asSeconds();
       }
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-	player_speed.x -= PLAYER_ACCEL*deltaTime.asSeconds();
+	player.velocity.x -= PLAYER_ACCEL*deltaTime.asSeconds();
       }
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-	player_rotation -= PLAYER_TURNRATE*deltaTime.asSeconds();
+	player.rotate(PLAYER_TURNRATE*deltaTime.asSeconds());
       }
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-	player_rotation += PLAYER_TURNRATE*deltaTime.asSeconds();
+	player.rotate(PLAYER_TURNRATE*deltaTime.asSeconds());
       }
 
       // Mouse movement
@@ -164,34 +162,31 @@ int main(int argc, char* argv[])
 	sf::Mouse::setPosition(sf::Vector2i(WINDOW_RESOLUTION_WIDTH/2, WINDOW_RESOLUTION_HEIGHT/2), window);
       }
 
-      player_rotation += PLAYER_LOOK_SENSITIVITY*mouse_delta.x*deltaTime.asSeconds();
-
-      cout << "Rotation: " << player_rotation << endl;
+      if(sqrMagnitude(mouse_delta) >= 0.0f) {
+	player.rotate(PLAYER_LOOK_SENSITIVITY*mouse_delta.x*deltaTime.asSeconds());
+      }
 
       // Player physics
-      if(sqrMagnitude(player_speed) > 0.0f) {
-	float speed_magnitude = magnitude(player_speed);
+      if(sqrMagnitude(player.velocity) > 0.0f) {
+	float speed_magnitude = magnitude(player.velocity);
 
 	// Apply friction
 	if(speed_magnitude <= PLAYER_FRICTION*deltaTime.asSeconds()) {
-	  player_speed.x = 0.0f;
-	  player_speed.y = 0.0f;
+	  player.velocity.x = 0.0f;
+	  player.velocity.y = 0.0f;
 	} else {
-	  player_speed -= (player_speed/speed_magnitude)*PLAYER_FRICTION*deltaTime.asSeconds();
+	  player.velocity -= (player.velocity/speed_magnitude)*PLAYER_FRICTION*deltaTime.asSeconds();
 	}
 
 	// Cap player speed
 	// TODO: Replace with proper mathematical approach code
 	if(speed_magnitude > PLAYER_MAXSPEED) {
-	  player_speed = PLAYER_MAXSPEED*(player_speed/speed_magnitude);
+	  player.velocity = PLAYER_MAXSPEED*(player.velocity/speed_magnitude);
 	}
 	
 	// Apply player speed
-	player_position += player_speed*deltaTime.asSeconds();
+	player.position += player.velocity*deltaTime.asSeconds();
       }
-
-      // Player rotation
-      player_shape.setRotation(player_rotation);
     }
 
     // Render game
@@ -204,16 +199,16 @@ int main(int argc, char* argv[])
 
     //*
     for(int slice = 0; slice < WINDOW_RESOLUTION_WIDTH; ++slice) {
-      float slice_angle = player_rotation + slice_width*slice;
+      float slice_angle = player.euler_deg() + slice_width*slice;
       float sqr_distance = -1.0f;
 
       sf::Vector2f intersection;
       sf::Vector2f slice_target(RAYCAST_VIEWDISTANCE*sin(DEG_TO_RAD*slice_angle), RAYCAST_VIEWDISTANCE*cos(DEG_TO_RAD*slice_angle));
-      line slice_segment(player_position, player_position + slice_target);
+      line slice_segment(player.position, player.position + slice_target);
       
       for(auto& wall : map) {
 	if(findIntersection(slice_segment, wall, &intersection)) {
-	  float intersection_distance = sqrMagnitude(intersection - player_position);
+	  float intersection_distance = sqrMagnitude(intersection - player.position);
 	  
 	  if(sqr_distance < 0.0f || intersection_distance < sqr_distance) {
 	    sqr_distance = intersection_distance;
@@ -242,7 +237,7 @@ int main(int argc, char* argv[])
     sf::Vector2f minimap_offset(WINDOW_RESOLUTION_WIDTH/2, WINDOW_RESOLUTION_HEIGHT/2);
 
     // -- Draw player
-    player_shape.setPosition(minimap_offset + minimap_scale*player_position - (player_shape.getRadius() + player_shape.getOutlineThickness())*sf::Vector2f(1.0f, 1.0f));
+    player_shape.setPosition(minimap_offset + minimap_scale*player.position - (player_shape.getRadius() + player_shape.getOutlineThickness())*sf::Vector2f(1.0f, 1.0f));
     window.draw(player_shape);
 
     // -- Draw walls

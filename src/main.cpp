@@ -32,6 +32,27 @@ struct entity {
 
   entity(sf::Vector2f start_position, sf::Vector2f start_direction):
     position(start_position), direction(start_direction) {}
+
+  void rotate(float rotation_angle)
+    {
+      float new_x, new_y;
+      
+      new_x = direction.x*cos(-rotation_angle) - direction.y*sin(-rotation_angle);
+      new_y = direction.x*sin(-rotation_angle) + direction.y*cos(-rotation_angle);
+
+      direction.x = new_x;
+      direction.y = new_y;
+    }
+
+  float euler()
+    {
+      return atan2(direction.y, direction.x);
+    }
+
+  float euler_deg()
+    {
+      return RAD_TO_DEG*this->euler();
+    }
 };
 
 struct line {

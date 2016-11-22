@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
 
   sf::Clock gameClock;
   
-  sf::RenderWindow window(sf::VideoMode(WINDOW_RESOLUTION_WIDTH, WINDOW_RESOLUTION_HEIGHT), "My Window", sf::Style::None);
+  sf::RenderWindow window(sf::VideoMode(WINDOW_RESOLUTION_WIDTH, WINDOW_RESOLUTION_HEIGHT), "doogue", sf::Style::None);
 
   // Map Setup
   vector<line> map;

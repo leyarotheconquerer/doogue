@@ -195,16 +195,18 @@ int main(int argc, char* argv[])
 
     // Raycast walls
     int slice_count = WINDOW_RESOLUTION_WIDTH;
-    float slice_width = (float)RAYCAST_FOV/WINDOW_RESOLUTION_WIDTH;
+    float slice_width = 1.0f; //(float)RAYCAST_FOV/WINDOW_RESOLUTION_WIDTH;
+    sf::Vector2f plane_direction(-player.direction.y, player.direction.x);
+    sf::Vector2f plane_anchor = player.position + (WINDOW_RESOLUTION_WIDTH/2.0f)*(float)(1.0f/tan(RAYCAST_FOV))*player.direction;
+    sf::Vector2f plane_base = plane_anchor - (WINDOW_RESOLUTION_WIDTH/2.0f)*plane_direction;
     vector<sf::Vertex> slice_points(2*WINDOW_RESOLUTION_WIDTH);
 
     //*
     for(int slice = 0; slice < WINDOW_RESOLUTION_WIDTH; ++slice) {
-      float slice_angle = player.euler_deg() + slice_width*slice;
       float sqr_distance = -1.0f;
 
       sf::Vector2f intersection;
-      sf::Vector2f slice_target(RAYCAST_VIEWDISTANCE*sin(DEG_TO_RAD*slice_angle), RAYCAST_VIEWDISTANCE*cos(DEG_TO_RAD*slice_angle));
+      sf::Vector2f slice_target = RAYCAST_VIEWDISTANCE*normalize(plane_base + slice*slice_width*plane_direction);
       line slice_segment(player.position, player.position + slice_target);
       
       for(auto& wall : map) {

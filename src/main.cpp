@@ -73,7 +73,6 @@ int main(int argc, char* argv[])
 {
   bool paused = false;
   bool mouse_locked = true;
-  bool fix_perspective = true;
 
   sf::Clock gameClock;
   
@@ -104,7 +103,6 @@ int main(int argc, char* argv[])
       case sf::Event::KeyReleased:
 	switch(event.key.code) {
 	case sf::Keyboard::L: mouse_locked = !mouse_locked; break;
-	case sf::Keyboard::P: fix_perspective = !fix_perspective; break;
 	}
 	
 	break;

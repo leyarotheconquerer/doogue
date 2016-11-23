@@ -130,20 +130,21 @@ int main(int argc, char* argv[])
       // Game logic
 
       // Player input
+      sf::Vector2f player_accel;
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-	player.velocity.y += PLAYER_ACCEL*deltaTime.asSeconds();
+	player_accel.y += PLAYER_ACCEL*deltaTime.asSeconds();
       }
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-	player.velocity.y -= PLAYER_ACCEL*deltaTime.asSeconds();
+	player_accel.y -= PLAYER_ACCEL*deltaTime.asSeconds();
       }
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-	player.velocity.x += PLAYER_ACCEL*deltaTime.asSeconds();
+	player_accel.x += PLAYER_ACCEL*deltaTime.asSeconds();
       }
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-	player.velocity.x -= PLAYER_ACCEL*deltaTime.asSeconds();
+	player_accel.x -= PLAYER_ACCEL*deltaTime.asSeconds();
       }
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
@@ -151,7 +152,7 @@ int main(int argc, char* argv[])
       }
 
       if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-	player.rotate(PLAYER_TURNRATE*deltaTime.asSeconds());
+	player.rotate(-PLAYER_TURNRATE*deltaTime.asSeconds());
       }
 
       // Mouse movement
@@ -161,11 +162,16 @@ int main(int argc, char* argv[])
 
       if(mouse_locked) {
 	sf::Mouse::setPosition(sf::Vector2i(WINDOW_RESOLUTION_WIDTH/2, WINDOW_RESOLUTION_HEIGHT/2), window);
+	mouse_previous = sf::Vector2f(sf::Mouse::getPosition().x, sf::Mouse::getPosition().y);
       }
 
       if(sqrMagnitude(mouse_delta) >= 0.0f) {
-	player.rotate(PLAYER_LOOK_SENSITIVITY*mouse_delta.x*deltaTime.asSeconds());
+	player.rotate(-PLAYER_LOOK_SENSITIVITY*mouse_delta.x*deltaTime.asSeconds());
       }
+
+      // Apply accel to velocity
+      player.velocity += player_accel.y*player.direction;
+      player.velocity += -player_accel.x*sf::Vector2f(-player.direction.y, player.direction.x);
 
       // Player physics
       if(sqrMagnitude(player.velocity) > 0.0f) {

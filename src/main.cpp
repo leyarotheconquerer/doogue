@@ -240,21 +240,6 @@ int main(int argc, char* argv[])
     //*/
 
     window.draw(&slice_points[0], 2*WINDOW_RESOLUTION_WIDTH, sf::Lines);
-
-    // Draw a minimap for the sake of debugging
-    float minimap_scale = 10.0f;
-    sf::Vector2f minimap_offset(WINDOW_RESOLUTION_WIDTH/2, WINDOW_RESOLUTION_HEIGHT/2);
-
-    // -- Draw player
-    player_shape.setPosition(minimap_offset + minimap_scale*player.position - (player_shape.getRadius() + player_shape.getOutlineThickness())*sf::Vector2f(1.0f, 1.0f));
-    window.draw(player_shape);
-
-    // -- Draw walls
-    for(auto& wall : map) {
-      sf::Vertex line[] = { minimap_offset + minimap_scale*wall.first, minimap_offset + minimap_scale*wall.second };
-      window.draw(line, 2, sf::Lines);
-    }
-    
     window.display();
   }
   

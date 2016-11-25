@@ -22,6 +22,8 @@
 
 #define RAYCAST_FOV 60
 #define RAYCAST_VIEWDISTANCE 25.0f
+#define RAYCAST_RESOLUTION_WIDTH 1024
+#define RAYCAST_RESOLUTION_HEIGHT 768
 
 using namespace std;
 
@@ -75,8 +77,12 @@ int main(int argc, char* argv[])
   bool mouse_locked = true;
 
   sf::Clock gameClock;
-  
+
   sf::RenderWindow window(sf::VideoMode(WINDOW_RESOLUTION_WIDTH, WINDOW_RESOLUTION_HEIGHT), "doogue", sf::Style::None);
+
+  // Renderer
+  sf::Uint8* render_buffer = new sf::Uint8[RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT*4];
+  sf::Texture render_texture;
 
   // Map Setup
   vector<line> map;
@@ -230,11 +236,23 @@ int main(int argc, char* argv[])
 	float distance = sqrt(sqr_distance);
 	float height = WINDOW_RESOLUTION_HEIGHT/(distance < 0.05f ? 0.05f : distance);
 
-	float start = -height/2+WINDOW_RESOLUTION_HEIGHT/2;
-	float end = height/2+WINDOW_RESOLUTION_HEIGHT/2;
+	int start = (int)(-height/2+WINDOW_RESOLUTION_HEIGHT/2);
+	int end = (int)(height/2+WINDOW_RESOLUTION_HEIGHT/2);
 
-	slice_points[2*slice] = sf::Vertex(sf::Vector2f(slice, start));
-	slice_points[2*slice + 1] = sf::Vertex(sf::Vector2f(slice, end));
+	start = start < 0 ? 0 : start;
+	end = end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT - 1 : 0;
+
+	for(int slice_y = start; start <= end; ++slice_y) {
+	  cout << "HERE WE GO!" << endl;
+	  int render_offset = RAYCAST_RESOLUTION_WIDTH*slice_y + slice;
+	  sf::Color pixel_color = sf::Color::White;
+
+	  // Draw pixel
+	  render_buffer[render_offset + 0] = pixel_color.r;
+	  render_buffer[render_offset + 1] = pixel_color.g;
+	  render_buffer[render_offset + 2] = pixel_color.b;
+	  render_buffer[render_offset + 3] = pixel_color.a;
+	}
       }
     }
     //*/
@@ -242,6 +260,9 @@ int main(int argc, char* argv[])
     window.draw(&slice_points[0], 2*WINDOW_RESOLUTION_WIDTH, sf::Lines);
     window.display();
   }
+
+  // Free render buffer
+  delete[] render_buffer;
   
   return 0;
 }

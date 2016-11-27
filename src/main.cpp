@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
   sf::RenderWindow window(sf::VideoMode(WINDOW_RESOLUTION_WIDTH, WINDOW_RESOLUTION_HEIGHT), "doogue", sf::Style::None);
 
   // Renderer
-  sf::Uint8* render_buffer = new sf::Uint8[RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT*4];
+  sf::Uint8 render_buffer[RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT*4];
   sf::Texture render_texture;
 
   // Map Setup
@@ -206,18 +206,18 @@ int main(int argc, char* argv[])
     window.clear();
 
     // Raycast walls
-    int slice_count = WINDOW_RESOLUTION_WIDTH;
-    float slice_width = 1.0f; //(float)RAYCAST_FOV/WINDOW_RESOLUTION_WIDTH;
+    int slice_count = RAYCAST_RESOLUTION_WIDTH;
+    float slice_width = 1.0f; //(float)RAYCAST_FOV/RAYCAST_RESOLUTION_WIDTH;
     sf::Vector2f plane_direction(-player.direction.y, player.direction.x);
-    sf::Vector2f plane_anchor = player.position + (WINDOW_RESOLUTION_WIDTH/2.0f)*(float)(1.0f/tan(RAYCAST_FOV))*player.direction;
-    sf::Vector2f plane_base = plane_anchor - (WINDOW_RESOLUTION_WIDTH/2.0f)*plane_direction;
-    vector<sf::Vertex> slice_points(2*WINDOW_RESOLUTION_WIDTH);
+    sf::Vector2f plane_anchor = player.position + (RAYCAST_RESOLUTION_WIDTH/2.0f)*(float)(1.0f/tan(RAYCAST_FOV))*player.direction;
+    sf::Vector2f plane_base = plane_anchor - (RAYCAST_RESOLUTION_WIDTH/2.0f)*plane_direction;
+    vector<sf::Vertex> slice_points(2*RAYCAST_RESOLUTION_WIDTH);
 
     //*
-    for(int slice = 0; slice < WINDOW_RESOLUTION_WIDTH; ++slice) {
+    for(int slice = 0; slice < RAYCAST_RESOLUTION_WIDTH; ++slice) {
       float sqr_distance = -1.0f;
 
-      sf::Vector2f intersection;
+       sf::Vector2f intersection;
       sf::Vector2f slice_target = RAYCAST_VIEWDISTANCE*normalize(plane_base + slice*slice_width*plane_direction);
       line slice_segment(player.position, player.position + slice_target);
       
@@ -234,17 +234,16 @@ int main(int argc, char* argv[])
       // Draw wall
       if(sqr_distance >= 0.0f) {
 	float distance = sqrt(sqr_distance);
-	float height = WINDOW_RESOLUTION_HEIGHT/(distance < 0.05f ? 0.05f : distance);
+	float height = RAYCAST_RESOLUTION_HEIGHT/(distance < 0.05f ? 0.05f : distance);
 
-	int start = (int)(-height/2+WINDOW_RESOLUTION_HEIGHT/2);
-	int end = (int)(height/2+WINDOW_RESOLUTION_HEIGHT/2);
+	int start = (int)(-height/2+RAYCAST_RESOLUTION_HEIGHT/2);
+	int end = (int)(height/2+RAYCAST_RESOLUTION_HEIGHT/2);
 
 	start = start < 0 ? 0 : start;
-	end = end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT - 1 : 0;
+	end = end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT - 1 : end;
 
-	for(int slice_y = start; start <= end; ++slice_y) {
-	  cout << "HERE WE GO!" << endl;
-	  int render_offset = RAYCAST_RESOLUTION_WIDTH*slice_y + slice;
+	for(int slice_y = start; slice_y < end; ++slice_y) {
+	  int render_offset = RAYCAST_RESOLUTION_WIDTH*4*slice_y + slice*4;
 	  sf::Color pixel_color = sf::Color::White;
 
 	  // Draw pixel
@@ -260,9 +259,6 @@ int main(int argc, char* argv[])
     window.draw(&slice_points[0], 2*WINDOW_RESOLUTION_WIDTH, sf::Lines);
     window.display();
   }
-
-  // Free render buffer
-  delete[] render_buffer;
   
   return 0;
 }

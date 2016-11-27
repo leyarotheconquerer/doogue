@@ -83,6 +83,10 @@ int main(int argc, char* argv[])
   // Renderer
   sf::Uint8 render_buffer[RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT*4];
   sf::Texture render_texture;
+  sf::Sprite render_sprite;
+  
+  render_texture.create(RAYCAST_RESOLUTION_WIDTH, RAYCAST_RESOLUTION_HEIGHT);
+  render_sprite.setTexture(render_texture);
 
   // Map Setup
   vector<line> map;
@@ -205,6 +209,15 @@ int main(int argc, char* argv[])
     // Render game
     window.clear();
 
+    // Lazy clear buffer
+    // XXX: Should be replaced by some form of smart clear... or not?
+    for(int buffer_index = 0; buffer_index < RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT; ++buffer_index) {
+      render_buffer[buffer_index*4 + 0] = sf::Color::Red.r;
+      render_buffer[buffer_index*4 + 1] = sf::Color::Red.g;
+      render_buffer[buffer_index*4 + 2] = sf::Color::Red.b;
+      render_buffer[buffer_index*4 + 3] = sf::Color::Red.a;
+    }
+
     // Raycast walls
     int slice_count = RAYCAST_RESOLUTION_WIDTH;
     float slice_width = 1.0f; //(float)RAYCAST_FOV/RAYCAST_RESOLUTION_WIDTH;
@@ -212,8 +225,7 @@ int main(int argc, char* argv[])
     sf::Vector2f plane_anchor = player.position + (RAYCAST_RESOLUTION_WIDTH/2.0f)*(float)(1.0f/tan(RAYCAST_FOV))*player.direction;
     sf::Vector2f plane_base = plane_anchor - (RAYCAST_RESOLUTION_WIDTH/2.0f)*plane_direction;
     vector<sf::Vertex> slice_points(2*RAYCAST_RESOLUTION_WIDTH);
-
-    //*
+    
     for(int slice = 0; slice < RAYCAST_RESOLUTION_WIDTH; ++slice) {
       float sqr_distance = -1.0f;
 
@@ -254,9 +266,12 @@ int main(int argc, char* argv[])
 	}
       }
     }
-    //*/
 
-    window.draw(&slice_points[0], 2*WINDOW_RESOLUTION_WIDTH, sf::Lines);
+    // Update buffer texture
+    render_texture.update(&render_buffer[0]);
+
+    //window.draw(&slice_points[0], 2*WINDOW_RESOLUTION_WIDTH, sf::Lines);
+    window.draw(render_sprite);
     window.display();
   }
   

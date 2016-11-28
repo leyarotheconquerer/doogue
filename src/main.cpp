@@ -212,10 +212,20 @@ int main(int argc, char* argv[])
     // Lazy clear buffer
     // XXX: Should be replaced by some form of smart clear... or not?
     for(int buffer_index = 0; buffer_index < RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT; ++buffer_index) {
-      render_buffer[buffer_index*4 + 0] = sf::Color::Red.r;
-      render_buffer[buffer_index*4 + 1] = sf::Color::Red.g;
-      render_buffer[buffer_index*4 + 2] = sf::Color::Red.b;
-      render_buffer[buffer_index*4 + 3] = sf::Color::Red.a;
+      sf::Color backing_color;
+
+      // Choose Color
+      if(buffer_index >= (RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT)/2) {
+	backing_color = sf::Color(150, 150, 150);
+      } else {
+	backing_color = sf::Color(40, 40, 40);
+      }
+
+      // Clear Pixel
+      render_buffer[buffer_index*4 + 0] = backing_color.r;
+      render_buffer[buffer_index*4 + 1] = backing_color.g;
+      render_buffer[buffer_index*4 + 2] = backing_color.b;
+      render_buffer[buffer_index*4 + 3] = backing_color.a;
     }
 
     // Raycast walls

@@ -17,13 +17,13 @@
 #define PLAYER_LOOK_SENSITIVITY 2.0f
 #define PLAYER_TURNRATE 1.0f
 
-#define WINDOW_RESOLUTION_WIDTH 1024
-#define WINDOW_RESOLUTION_HEIGHT 768
+#define WINDOW_RESOLUTION_WIDTH 1920
+#define WINDOW_RESOLUTION_HEIGHT 1080
 
 #define RAYCAST_FOV 60
 #define RAYCAST_VIEWDISTANCE 25.0f
-#define RAYCAST_RESOLUTION_WIDTH 1024
-#define RAYCAST_RESOLUTION_HEIGHT 768
+#define RAYCAST_RESOLUTION_WIDTH (1920/6)
+#define RAYCAST_RESOLUTION_HEIGHT (1080/6)
 
 using namespace std;
 
@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
 	break;
       }
     }
-      
+    
     // Game time!!
     sf::Time deltaTime = gameClock.restart();
 
@@ -229,7 +229,7 @@ int main(int argc, char* argv[])
     for(int slice = 0; slice < RAYCAST_RESOLUTION_WIDTH; ++slice) {
       float sqr_distance = -1.0f;
 
-       sf::Vector2f intersection;
+      sf::Vector2f intersection;
       sf::Vector2f slice_target = RAYCAST_VIEWDISTANCE*normalize(plane_base + slice*slice_width*plane_direction);
       line slice_segment(player.position, player.position + slice_target);
       
@@ -270,7 +270,9 @@ int main(int argc, char* argv[])
     // Update buffer texture
     render_texture.update(&render_buffer[0]);
 
-    //window.draw(&slice_points[0], 2*WINDOW_RESOLUTION_WIDTH, sf::Lines);
+    // Update the sprite
+    render_sprite.setScale((float)WINDOW_RESOLUTION_WIDTH/RAYCAST_RESOLUTION_WIDTH, (float)WINDOW_RESOLUTION_HEIGHT/RAYCAST_RESOLUTION_HEIGHT);
+    
     window.draw(render_sprite);
     window.display();
   }

@@ -252,7 +252,7 @@ int main(int argc, char* argv[])
 	int end = (int)(height/2+RAYCAST_RESOLUTION_HEIGHT/2);
 
 	start = start < 0 ? 0 : start;
-	end = end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT - 1 : end;
+	end = end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT : end;
 
 	for(int slice_y = start; slice_y < end; ++slice_y) {
 	  int render_offset = RAYCAST_RESOLUTION_WIDTH*4*slice_y + slice*4;

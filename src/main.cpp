@@ -24,6 +24,7 @@
 #define RAYCAST_VIEWDISTANCE 25.0f
 #define RAYCAST_RESOLUTION_WIDTH (1920/6)
 #define RAYCAST_RESOLUTION_HEIGHT (1080/6)
+#define RAYCAST_TEXTURE_SIZE 64
 
 using namespace std;
 
@@ -95,6 +96,11 @@ int main(int argc, char* argv[])
   map.push_back(line(sf::Vector2f(-5.0f, 5.0f), sf::Vector2f(5.0f, 5.0f)));
   map.push_back(line(sf::Vector2f(5.0f, 5.0f), sf::Vector2f(5.0f, -5.0f)));
   map.push_back(line(sf::Vector2f(5.0f, -5.0f), sf::Vector2f(-5.0f, -5.0f)));
+
+  // Wall Textures
+  sf::Image wall_texture;
+  wall_texture.create(RAYCAST_TEXTURE_SIZE, RAYCAST_TEXTURE_SIZE);
+  wall_texture.loadFromFile("/home/spenser/projects/game-off-2016/build/textures/greystone.png");
 
   // Player Setup
   entity player(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(0.0f, 1.0f));
@@ -237,6 +243,7 @@ int main(int argc, char* argv[])
     vector<sf::Vertex> slice_points(2*RAYCAST_RESOLUTION_WIDTH);
     
     for(int slice = 0; slice < RAYCAST_RESOLUTION_WIDTH; ++slice) {
+      float textel_offset = 0.0f;
       float sqr_distance = -1.0f;
 
       sf::Vector2f intersection;
@@ -249,6 +256,7 @@ int main(int argc, char* argv[])
 	  
 	  if(sqr_distance < 0.0f || intersection_distance < sqr_distance) {
 	    sqr_distance = intersection_distance;
+	    textel_offset = magnitude(intersection - wall.first)/magnitude(wall.second - wall.first);
 	  }
 	}
       }
@@ -266,7 +274,7 @@ int main(int argc, char* argv[])
 
 	for(int slice_y = start; slice_y < end; ++slice_y) {
 	  int render_offset = RAYCAST_RESOLUTION_WIDTH*4*slice_y + slice*4;
-	  sf::Color pixel_color = sf::Color::White;
+	  sf::Color pixel_color = wall_texture.getPixel((int)(16*textel_offset*RAYCAST_TEXTURE_SIZE)%RAYCAST_TEXTURE_SIZE, (int)((slice_y - start)/height*RAYCAST_TEXTURE_SIZE));
 
 	  // Draw pixel
 	  render_buffer[render_offset + 0] = pixel_color.r;
@@ -282,8 +290,8 @@ int main(int argc, char* argv[])
 
     // Update the sprite
     render_sprite.setScale((float)WINDOW_RESOLUTION_WIDTH/RAYCAST_RESOLUTION_WIDTH, (float)WINDOW_RESOLUTION_HEIGHT/RAYCAST_RESOLUTION_HEIGHT);
-    
     window.draw(render_sprite);
+    
     window.display();
   }
   

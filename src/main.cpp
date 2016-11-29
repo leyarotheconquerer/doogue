@@ -269,12 +269,12 @@ int main(int argc, char* argv[])
 	int start = (int)(-height/2+RAYCAST_RESOLUTION_HEIGHT/2);
 	int end = (int)(height/2+RAYCAST_RESOLUTION_HEIGHT/2);
 
-	start = start < 0 ? 0 : start;
-	end = end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT : end;
+	int start_capped = start < 0 ? 0 : start;
+	int end_capped = end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT : end;
 
-	for(int slice_y = start; slice_y < end; ++slice_y) {
+	for(int slice_y = start_capped; slice_y < end_capped; ++slice_y) {
 	  int render_offset = RAYCAST_RESOLUTION_WIDTH*4*slice_y + slice*4;
-	  sf::Color pixel_color = wall_texture.getPixel((int)(16*textel_offset*RAYCAST_TEXTURE_SIZE)%RAYCAST_TEXTURE_SIZE, (int)((slice_y - start)/height*RAYCAST_TEXTURE_SIZE));
+	  sf::Color pixel_color = wall_texture.getPixel((int)(16*textel_offset*RAYCAST_TEXTURE_SIZE)%RAYCAST_TEXTURE_SIZE, (int)((slice_y - start_capped + (start < 0 ? -1*start : 0))/height*RAYCAST_TEXTURE_SIZE));
 
 	  // Draw pixel
 	  render_buffer[render_offset + 0] = pixel_color.r;

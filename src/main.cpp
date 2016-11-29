@@ -8,8 +8,8 @@
 #include <SFML/Graphics.hpp>
 
 #define PI 3.1415926535f
-#define DEG_TO_RAD PI/180.0f
-#define RAD_TO_DEG 180.0f/PI
+#define DEG_TO_RAD (PI/180.0f)
+#define RAD_TO_DEG (180.0f/PI)
 
 #define PLAYER_ACCEL 42.0f
 #define PLAYER_FRICTION 28.0f

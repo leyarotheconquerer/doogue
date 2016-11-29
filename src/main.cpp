@@ -8,8 +8,8 @@
 #include <SFML/Graphics.hpp>
 
 #define PI 3.1415926535f
-#define DEG_TO_RAD PI/180.0f
-#define RAD_TO_DEG 180.0f/PI
+#define DEG_TO_RAD (PI/180.0f)
+#define RAD_TO_DEG (180.0f/PI)
 
 #define PLAYER_ACCEL 42.0f
 #define PLAYER_FRICTION 28.0f
@@ -24,6 +24,7 @@
 #define RAYCAST_VIEWDISTANCE 25.0f
 #define RAYCAST_RESOLUTION_WIDTH (1920/6)
 #define RAYCAST_RESOLUTION_HEIGHT (1080/6)
+#define RAYCAST_TEXTURE_SIZE 64
 
 using namespace std;
 
@@ -95,6 +96,11 @@ int main(int argc, char* argv[])
   map.push_back(line(sf::Vector2f(-5.0f, 5.0f), sf::Vector2f(5.0f, 5.0f)));
   map.push_back(line(sf::Vector2f(5.0f, 5.0f), sf::Vector2f(5.0f, -5.0f)));
   map.push_back(line(sf::Vector2f(5.0f, -5.0f), sf::Vector2f(-5.0f, -5.0f)));
+
+  // Wall Textures
+  sf::Image wall_texture;
+  wall_texture.create(RAYCAST_TEXTURE_SIZE, RAYCAST_TEXTURE_SIZE);
+  wall_texture.loadFromFile("/home/spenser/projects/game-off-2016/build/textures/greystone.png");
 
   // Player Setup
   entity player(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(0.0f, 1.0f));
@@ -212,10 +218,20 @@ int main(int argc, char* argv[])
     // Lazy clear buffer
     // XXX: Should be replaced by some form of smart clear... or not?
     for(int buffer_index = 0; buffer_index < RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT; ++buffer_index) {
-      render_buffer[buffer_index*4 + 0] = sf::Color::Red.r;
-      render_buffer[buffer_index*4 + 1] = sf::Color::Red.g;
-      render_buffer[buffer_index*4 + 2] = sf::Color::Red.b;
-      render_buffer[buffer_index*4 + 3] = sf::Color::Red.a;
+      sf::Color backing_color;
+
+      // Choose Color
+      if(buffer_index >= (RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT)/2) {
+	backing_color = sf::Color(150, 150, 150);
+      } else {
+	backing_color = sf::Color(40, 40, 40);
+      }
+
+      // Clear Pixel
+      render_buffer[buffer_index*4 + 0] = backing_color.r;
+      render_buffer[buffer_index*4 + 1] = backing_color.g;
+      render_buffer[buffer_index*4 + 2] = backing_color.b;
+      render_buffer[buffer_index*4 + 3] = backing_color.a;
     }
 
     // Raycast walls
@@ -227,6 +243,7 @@ int main(int argc, char* argv[])
     vector<sf::Vertex> slice_points(2*RAYCAST_RESOLUTION_WIDTH);
     
     for(int slice = 0; slice < RAYCAST_RESOLUTION_WIDTH; ++slice) {
+      float textel_offset = 0.0f;
       float sqr_distance = -1.0f;
 
       sf::Vector2f intersection;
@@ -239,6 +256,7 @@ int main(int argc, char* argv[])
 	  
 	  if(sqr_distance < 0.0f || intersection_distance < sqr_distance) {
 	    sqr_distance = intersection_distance;
+	    textel_offset = magnitude(intersection - wall.first)/magnitude(wall.second - wall.first);
 	  }
 	}
       }
@@ -251,12 +269,12 @@ int main(int argc, char* argv[])
 	int start = (int)(-height/2+RAYCAST_RESOLUTION_HEIGHT/2);
 	int end = (int)(height/2+RAYCAST_RESOLUTION_HEIGHT/2);
 
-	start = start < 0 ? 0 : start;
-	end = end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT : end;
+	int start_capped = start < 0 ? 0 : start;
+	int end_capped = end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT : end;
 
-	for(int slice_y = start; slice_y < end; ++slice_y) {
+	for(int slice_y = start_capped; slice_y < end_capped; ++slice_y) {
 	  int render_offset = RAYCAST_RESOLUTION_WIDTH*4*slice_y + slice*4;
-	  sf::Color pixel_color = sf::Color::White;
+	  sf::Color pixel_color = wall_texture.getPixel((int)(16*textel_offset*RAYCAST_TEXTURE_SIZE)%RAYCAST_TEXTURE_SIZE, (int)((slice_y - start_capped + (start < 0 ? -1*start : 0))/height*RAYCAST_TEXTURE_SIZE));
 
 	  // Draw pixel
 	  render_buffer[render_offset + 0] = pixel_color.r;
@@ -272,8 +290,8 @@ int main(int argc, char* argv[])
 
     // Update the sprite
     render_sprite.setScale((float)WINDOW_RESOLUTION_WIDTH/RAYCAST_RESOLUTION_WIDTH, (float)WINDOW_RESOLUTION_HEIGHT/RAYCAST_RESOLUTION_HEIGHT);
-    
     window.draw(render_sprite);
+    
     window.display();
   }
   

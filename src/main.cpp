@@ -304,6 +304,19 @@ int main(int argc, char* argv[])
 	    cout << "We got one: " << sprite_anchor.x << ", " << sprite_anchor.y << endl;
 
 	    // TODO: Refactor renderer to use a pixel buffer, blit sprite on buffer w/ depth check
+	    // Blit sprite into render buffer
+	    for(int blit_x = sprite_anchor.x; blit_x < sprite_anchor.x + distance_scaling*RAYCAST_SPRITE_WIDTH && blit_x < RAYCAST_RESOLUTION_WIDTH; ++blit_x) {
+	      for(int blit_y = sprite_anchor.y; blit_y < sprite_anchor.y + distance_scaling*RAYCAST_SPRITE_HEIGHT && blit_y < RAYCAST_RESOLUTION_HEIGHT; ++blit_y) {
+		int render_offset = RAYCAST_RESOLUTION_WIDTH*4*blit_y + 4*blit_x;
+		sf::Color pixel_color = thing.sprite.getPixel(blit_x - (int)sprite_anchor.x, blit_y - (int)sprite_anchor.y);
+
+		// Draw pixel
+		render_buffer[render_offset + 0] = pixel_color.r;
+		render_buffer[render_offset + 1] = pixel_color.g;
+		render_buffer[render_offset + 2] = pixel_color.b;
+		render_buffer[render_offset + 3] = pixel_color.a;
+	      }
+	    }
 	  }
 	}
       }

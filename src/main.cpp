@@ -233,7 +233,8 @@ int main(int argc, char* argv[])
       sf::Vector2f intersection;
       sf::Vector2f slice_target = RAYCAST_VIEWDISTANCE*normalize(plane_base + slice*slice_width*plane_direction);
       line slice_segment(player.position, player.position + slice_target);
-      
+
+      // Check walls
       for(auto& wall : map) {
 	if(findIntersection(slice_segment, wall, &intersection)) {
 	  float intersection_distance = sqrMagnitude(intersection - player.position);
@@ -254,6 +255,26 @@ int main(int argc, char* argv[])
 
 	slice_points[2*slice] = sf::Vertex(sf::Vector2f(slice, start));
 	slice_points[2*slice + 1] = sf::Vertex(sf::Vector2f(slice, end));
+      }
+
+      // Check entities
+      for(auto& thing : entities) {
+	line thing_view_segment(thing.position, thing.position);
+	
+	if(findIntersection(slice_segment, thing_view_segment, &intersection)) {
+	  if(sqrMagnitude(intersection - player.position) > 0.0f) {
+	    float distance = magnitude(intersection - player.position);
+	    float distance_scaling = 0.001f;
+
+	    if(distance > 0.0f) {
+	      distance_scaling = 1/distance;
+	    }
+
+	    sf::Vector2i sprite_anchor((int)(slice - (distance_scaling*RAYCAST_SPRITE_WIDTH)/2.0f), (int)(WINDOW_RESOLUTION_HEIGHT/2 - (distance_scaling*RAYCAST_SPRITE_HEIGHT)/2.0f));
+
+	    cout << "We got one: " << sprite_anchor.x << ", " << sprite_anchor.y << endl;
+	  }
+	}
       }
     }
     //*/

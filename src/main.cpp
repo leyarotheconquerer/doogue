@@ -259,7 +259,7 @@ int main(int argc, char* argv[])
 
       // Check entities
       for(auto& thing : entities) {
-	line thing_view_segment(thing.position, thing.position);
+	line thing_view_segment(thing.position, thing.position); // TODO: Use simple sprite width to make raycast gaurenteed
 	
 	if(findIntersection(slice_segment, thing_view_segment, &intersection)) {
 	  if(sqrMagnitude(intersection - player.position) > 0.0f) {
@@ -273,6 +273,8 @@ int main(int argc, char* argv[])
 	    sf::Vector2i sprite_anchor((int)(slice - (distance_scaling*RAYCAST_SPRITE_WIDTH)/2.0f), (int)(WINDOW_RESOLUTION_HEIGHT/2 - (distance_scaling*RAYCAST_SPRITE_HEIGHT)/2.0f));
 
 	    cout << "We got one: " << sprite_anchor.x << ", " << sprite_anchor.y << endl;
+
+	    // TODO: Refactor renderer to use a pixel buffer, blit sprite on buffer w/ depth check
 	  }
 	}
       }

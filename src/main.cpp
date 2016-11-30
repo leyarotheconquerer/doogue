@@ -81,6 +81,7 @@ int main(int argc, char* argv[])
   sf::RenderWindow window(sf::VideoMode(WINDOW_RESOLUTION_WIDTH, WINDOW_RESOLUTION_HEIGHT), "doogue", sf::Style::None);
 
   // Renderer
+  double render_depth[RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT];
   sf::Uint8 render_buffer[RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT*4];
   sf::Texture render_texture;
   sf::Sprite render_sprite;
@@ -212,10 +213,14 @@ int main(int argc, char* argv[])
     // Lazy clear buffer
     // XXX: Should be replaced by some form of smart clear... or not?
     for(int buffer_index = 0; buffer_index < RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT; ++buffer_index) {
+      // Color
       render_buffer[buffer_index*4 + 0] = sf::Color::Red.r;
       render_buffer[buffer_index*4 + 1] = sf::Color::Red.g;
       render_buffer[buffer_index*4 + 2] = sf::Color::Red.b;
       render_buffer[buffer_index*4 + 3] = sf::Color::Red.a;
+
+      // Depth
+      render_depth[buffer_index] = 1.0;
     }
 
     // Raycast walls
@@ -255,14 +260,20 @@ int main(int argc, char* argv[])
 	end = end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT : end;
 
 	for(int slice_y = start; slice_y < end; ++slice_y) {
+	  double local_depth = (double)distance/RAYCAST_VIEWDISTANCE;
 	  int render_offset = RAYCAST_RESOLUTION_WIDTH*4*slice_y + slice*4;
 	  sf::Color pixel_color = sf::Color::White;
 
-	  // Draw pixel
-	  render_buffer[render_offset + 0] = pixel_color.r;
-	  render_buffer[render_offset + 1] = pixel_color.g;
-	  render_buffer[render_offset + 2] = pixel_color.b;
-	  render_buffer[render_offset + 3] = pixel_color.a;
+	  if(local_depth < render_depth[RAYCAST_RESOLUTION_WIDTH*slice_y + slice]) {
+	    // Draw pixel
+	    render_buffer[render_offset + 0] = pixel_color.r;
+	    render_buffer[render_offset + 1] = pixel_color.g;
+	    render_buffer[render_offset + 2] = pixel_color.b;
+	    render_buffer[render_offset + 3] = pixel_color.a;
+
+	    // Render depth
+	    render_depth[RAYCAST_RESOLUTION_WIDTH*slice_y + slice] = local_depth;
+	  }
 	}
       }
     }

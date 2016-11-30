@@ -268,8 +268,9 @@ int main(int argc, char* argv[])
 	  int render_offset = RAYCAST_RESOLUTION_WIDTH*4*slice_y + slice*4;
 	  sf::Color pixel_color = sf::Color::White;
 
-	  if(local_depth < render_depth[RAYCAST_RESOLUTION_WIDTH*slice_y + slice]) {
+	  if(local_depth < render_depth[RAYCAST_RESOLUTION_WIDTH*slice_y + slice] && pixel_color.a > 0) { // XXX: Dirty transparency fix
 	    // Draw pixel
+	    // TODO: Appropriately redner pixel transparency
 	    render_buffer[render_offset + 0] = pixel_color.r;
 	    render_buffer[render_offset + 1] = pixel_color.g;
 	    render_buffer[render_offset + 2] = pixel_color.b;

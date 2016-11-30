@@ -22,6 +22,8 @@
 
 #define RAYCAST_FOV 60
 #define RAYCAST_VIEWDISTANCE 25.0f
+#define RAYCAST_SPRITE_WIDTH 64
+#define RAYCAST_SPRITE_HEIGHT 72
 
 using namespace std;
 
@@ -55,6 +57,18 @@ struct entity {
     }
 };
 
+struct render_entity {
+  sf::Vector2f position;
+  sf::Image sprite;
+
+  render_entity(const sf::Vector2f start_position, const std::string &image_name):
+    position(start_position)
+    {
+      this->sprite.create(RAYCAST_SPRITE_WIDTH, RAYCAST_SPRITE_HEIGHT);
+      this->sprite.loadFromFile(image_name);
+    }
+};
+
 struct line {
   sf::Vector2f first;
   sf::Vector2f second;
@@ -85,6 +99,11 @@ int main(int argc, char* argv[])
   map.push_back(line(sf::Vector2f(-5.0f, 5.0f), sf::Vector2f(5.0f, 5.0f)));
   map.push_back(line(sf::Vector2f(5.0f, 5.0f), sf::Vector2f(5.0f, -5.0f)));
   map.push_back(line(sf::Vector2f(5.0f, -5.0f), sf::Vector2f(-5.0f, -5.0f)));
+
+  // Entity Setup
+  vector<render_entity> entities;
+
+  entities.push_back(render_entity(sf::Vector2f(2.5f, 2.5f), "/home/spenser/projects/game-off-2016/build/chest.png"));
 
   // Player Setup
   entity player(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(0.0f, 1.0f));

@@ -97,6 +97,7 @@ int main(int argc, char* argv[])
   sf::RenderWindow window(sf::VideoMode(WINDOW_RESOLUTION_WIDTH, WINDOW_RESOLUTION_HEIGHT), "doogue", sf::Style::None);
 
   // Renderer
+  double render_depth[RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT];
   sf::Uint8 render_buffer[RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT*4];
   sf::Texture render_texture;
   sf::Sprite render_sprite;
@@ -111,6 +112,10 @@ int main(int argc, char* argv[])
   map.push_back(line(sf::Vector2f(-5.0f, 5.0f), sf::Vector2f(5.0f, 5.0f)));
   map.push_back(line(sf::Vector2f(5.0f, 5.0f), sf::Vector2f(5.0f, -5.0f)));
   map.push_back(line(sf::Vector2f(5.0f, -5.0f), sf::Vector2f(-5.0f, -5.0f)));
+  map.push_back(line(sf::Vector2f(1.5f, -0.15f), sf::Vector2f(-1.5f, -0.15f)));
+  map.push_back(line(sf::Vector2f(1.5f, 0.15f), sf::Vector2f(-1.5f, 0.15f)));
+  map.push_back(line(sf::Vector2f(1.5f, -0.15f), sf::Vector2f(1.5f, 0.15f)));
+  map.push_back(line(sf::Vector2f(-1.5f, -0.15f), sf::Vector2f(-1.5f, 0.15f)));
 
   // Wall Textures
   sf::Image wall_texture;
@@ -252,6 +257,9 @@ int main(int argc, char* argv[])
       render_buffer[buffer_index*4 + 1] = backing_color.g;
       render_buffer[buffer_index*4 + 2] = backing_color.b;
       render_buffer[buffer_index*4 + 3] = backing_color.a;
+
+      // Depth
+      render_depth[buffer_index] = 1.0;
     }
 
     // Raycast walls
@@ -294,14 +302,21 @@ int main(int argc, char* argv[])
 	int end_capped = end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT : end;
 
 	for(int slice_y = start_capped; slice_y < end_capped; ++slice_y) {
+	  double local_depth = (double)distance/RAYCAST_VIEWDISTANCE;
 	  int render_offset = RAYCAST_RESOLUTION_WIDTH*4*slice_y + slice*4;
 	  sf::Color pixel_color = wall_texture.getPixel((int)(16*textel_offset*RAYCAST_TEXTURE_SIZE)%RAYCAST_TEXTURE_SIZE, (int)((slice_y - start_capped + (start < 0 ? -1*start : 0))/height*RAYCAST_TEXTURE_SIZE));
 
-	  // Draw pixel
-	  render_buffer[render_offset + 0] = pixel_color.r;
-	  render_buffer[render_offset + 1] = pixel_color.g;
-	  render_buffer[render_offset + 2] = pixel_color.b;
-	  render_buffer[render_offset + 3] = pixel_color.a;
+	  if(local_depth < render_depth[RAYCAST_RESOLUTION_WIDTH*slice_y + slice] && pixel_color.a > 0) { // XXX: Dirty transparency fix
+	    // Draw pixel
+	    // TODO: Appropriately redner pixel transparency
+	    render_buffer[render_offset + 0] = pixel_color.r;
+	    render_buffer[render_offset + 1] = pixel_color.g;
+	    render_buffer[render_offset + 2] = pixel_color.b;
+	    render_buffer[render_offset + 3] = pixel_color.a;
+
+	    // Render depth
+	    render_depth[RAYCAST_RESOLUTION_WIDTH*slice_y + slice] = local_depth;
+	  }
 	}
       }
 

@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
   // Entity Setup
   vector<render_entity> entities;
 
-  entities.push_back(render_entity(sf::Vector2f(2.5f, 2.5f), "/home/spenser/projects/game-off-2016/build/chest.png"));
+  entities.push_back(render_entity(sf::Vector2f(1.6f, 0.25f), "/home/spenser/projects/game-off-2016/build/chest.png"));
 
   // Player Setup
   entity player(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(0.0f, 1.0f));
@@ -352,16 +352,21 @@ int main(int argc, char* argv[])
 	    
 	    // Blit sprite into render buffer
 	    for(int slice_y = start < 0 ? 0 : start; slice_y < (end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT - 1 : end); ++ slice_y) {
+	      
 	      int render_offset = RAYCAST_RESOLUTION_WIDTH*4*slice_y + 4*slice;
 	      float thing_textel_v = (slice_y - start)/height;
+	      double local_depth = (double)distance/RAYCAST_VIEWDISTANCE;
 	      sf::Color pixel_color = thing.sprite.getPixel(thing_textel_u*RAYCAST_SPRITE_WIDTH, thing_textel_v*RAYCAST_SPRITE_HEIGHT);
 
-	      if(pixel_color.a > 0) {
+	      if(local_depth < render_depth[RAYCAST_RESOLUTION_WIDTH*slice_y + slice] && pixel_color.a > 0) {
 		// Draw pixel
 		render_buffer[render_offset + 0] = pixel_color.r;
 		render_buffer[render_offset + 1] = pixel_color.g;
 		render_buffer[render_offset + 2] = pixel_color.b;
 		render_buffer[render_offset + 3] = pixel_color.a;
+
+		// Render depth
+		render_depth[RAYCAST_RESOLUTION_WIDTH*slice_y + slice] = local_depth;
 	      }
 	    }
 	  }

@@ -262,9 +262,9 @@ int main(int argc, char* argv[])
       }
 
       // Draw wall
-      if(sqr_distance >= 0.0f) {
+      if(sqr_distance > 0.0f) {
 	float distance = sqrt(sqr_distance);
-	float height = RAYCAST_RESOLUTION_HEIGHT/(distance < 0.05f ? 0.05f : distance);
+	float height = RAYCAST_RESOLUTION_HEIGHT/(distance < 0.05f ? 0.05f : distance); // XXX: Hack to avoid division by zero
 
 	int start = (int)(-height/2+RAYCAST_RESOLUTION_HEIGHT/2);
 	int end = (int)(height/2+RAYCAST_RESOLUTION_HEIGHT/2);

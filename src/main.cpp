@@ -17,11 +17,13 @@
 #define PLAYER_LOOK_SENSITIVITY 2.0f
 #define PLAYER_TURNRATE 1.0f
 
-#define WINDOW_RESOLUTION_WIDTH 1024
-#define WINDOW_RESOLUTION_HEIGHT 768
+#define WINDOW_RESOLUTION_WIDTH 1920
+#define WINDOW_RESOLUTION_HEIGHT 1080
 
 #define RAYCAST_FOV 60
 #define RAYCAST_VIEWDISTANCE 25.0f
+#define RAYCAST_RESOLUTION_WIDTH (1920/6)
+#define RAYCAST_RESOLUTION_HEIGHT (1080/6)
 #define RAYCAST_SPRITE_WIDTH 64
 #define RAYCAST_SPRITE_HEIGHT 72
 
@@ -89,8 +91,16 @@ int main(int argc, char* argv[])
   bool mouse_locked = true;
 
   sf::Clock gameClock;
-  
+
   sf::RenderWindow window(sf::VideoMode(WINDOW_RESOLUTION_WIDTH, WINDOW_RESOLUTION_HEIGHT), "doogue", sf::Style::None);
+
+  // Renderer
+  sf::Uint8 render_buffer[RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT*4];
+  sf::Texture render_texture;
+  sf::Sprite render_sprite;
+  
+  render_texture.create(RAYCAST_RESOLUTION_WIDTH, RAYCAST_RESOLUTION_HEIGHT);
+  render_sprite.setTexture(render_texture);
 
   // Map Setup
   vector<line> map;
@@ -120,8 +130,8 @@ int main(int argc, char* argv[])
     while(window.pollEvent(event)) {
       switch(event.type) {
       case sf::Event::KeyReleased:
-	if(event.key.code == sf::Keyboard::L) {
-	  mouse_locked = !mouse_locked;
+	switch(event.key.code) {
+	case sf::Keyboard::L: mouse_locked = !mouse_locked; break;
 	}
 	
 	break;
@@ -141,7 +151,7 @@ int main(int argc, char* argv[])
 	break;
       }
     }
-      
+    
     // Game time!!
     sf::Time deltaTime = gameClock.restart();
 
@@ -218,16 +228,24 @@ int main(int argc, char* argv[])
     // Render game
     window.clear();
 
-    // Raycast walls
-    int slice_count = WINDOW_RESOLUTION_WIDTH;
-    float slice_width = 1.0f; //(float)RAYCAST_FOV/WINDOW_RESOLUTION_WIDTH;
-    sf::Vector2f plane_direction(-player.direction.y, player.direction.x);
-    sf::Vector2f plane_anchor = player.position + (WINDOW_RESOLUTION_WIDTH/2.0f)*(float)(1.0f/tan(RAYCAST_FOV))*player.direction;
-    sf::Vector2f plane_base = plane_anchor - (WINDOW_RESOLUTION_WIDTH/2.0f)*plane_direction;
-    vector<sf::Vertex> slice_points(2*WINDOW_RESOLUTION_WIDTH);
+    // Lazy clear buffer
+    // XXX: Should be replaced by some form of smart clear... or not?
+    for(int buffer_index = 0; buffer_index < RAYCAST_RESOLUTION_WIDTH*RAYCAST_RESOLUTION_HEIGHT; ++buffer_index) {
+      render_buffer[buffer_index*4 + 0] = sf::Color::Red.r;
+      render_buffer[buffer_index*4 + 1] = sf::Color::Red.g;
+      render_buffer[buffer_index*4 + 2] = sf::Color::Red.b;
+      render_buffer[buffer_index*4 + 3] = sf::Color::Red.a;
+    }
 
-    //*
-    for(int slice = 0; slice < WINDOW_RESOLUTION_WIDTH; ++slice) {
+    // Raycast walls
+    int slice_count = RAYCAST_RESOLUTION_WIDTH;
+    float slice_width = 1.0f; //(float)RAYCAST_FOV/RAYCAST_RESOLUTION_WIDTH;
+    sf::Vector2f plane_direction(-player.direction.y, player.direction.x);
+    sf::Vector2f plane_anchor = player.position + (RAYCAST_RESOLUTION_WIDTH/2.0f)*(float)(1.0f/tan(RAYCAST_FOV))*player.direction;
+    sf::Vector2f plane_base = plane_anchor - (RAYCAST_RESOLUTION_WIDTH/2.0f)*plane_direction;
+    vector<sf::Vertex> slice_points(2*RAYCAST_RESOLUTION_WIDTH);
+    
+    for(int slice = 0; slice < RAYCAST_RESOLUTION_WIDTH; ++slice) {
       float sqr_distance = -1.0f;
 
       sf::Vector2f intersection;
@@ -248,13 +266,24 @@ int main(int argc, char* argv[])
       // Draw wall
       if(sqr_distance >= 0.0f) {
 	float distance = sqrt(sqr_distance);
-	float height = WINDOW_RESOLUTION_HEIGHT/(distance < 0.05f ? 0.05f : distance);
+	float height = RAYCAST_RESOLUTION_HEIGHT/(distance < 0.05f ? 0.05f : distance);
 
-	float start = -height/2+WINDOW_RESOLUTION_HEIGHT/2;
-	float end = height/2+WINDOW_RESOLUTION_HEIGHT/2;
+	int start = (int)(-height/2+RAYCAST_RESOLUTION_HEIGHT/2);
+	int end = (int)(height/2+RAYCAST_RESOLUTION_HEIGHT/2);
 
-	slice_points[2*slice] = sf::Vertex(sf::Vector2f(slice, start));
-	slice_points[2*slice + 1] = sf::Vertex(sf::Vector2f(slice, end));
+	start = start < 0 ? 0 : start;
+	end = end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT : end;
+
+	for(int slice_y = start; slice_y < end; ++slice_y) {
+	  int render_offset = RAYCAST_RESOLUTION_WIDTH*4*slice_y + slice*4;
+	  sf::Color pixel_color = sf::Color::White;
+
+	  // Draw pixel
+	  render_buffer[render_offset + 0] = pixel_color.r;
+	  render_buffer[render_offset + 1] = pixel_color.g;
+	  render_buffer[render_offset + 2] = pixel_color.b;
+	  render_buffer[render_offset + 3] = pixel_color.a;
+	}
       }
 
       // Check entities
@@ -279,9 +308,14 @@ int main(int argc, char* argv[])
 	}
       }
     }
-    //*/
 
-    window.draw(&slice_points[0], 2*WINDOW_RESOLUTION_WIDTH, sf::Lines);
+    // Update buffer texture
+    render_texture.update(&render_buffer[0]);
+
+    // Update the sprite
+    render_sprite.setScale((float)WINDOW_RESOLUTION_WIDTH/RAYCAST_RESOLUTION_WIDTH, (float)WINDOW_RESOLUTION_HEIGHT/RAYCAST_RESOLUTION_HEIGHT);
+    
+    window.draw(render_sprite);
     window.display();
   }
   

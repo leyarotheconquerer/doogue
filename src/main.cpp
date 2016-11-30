@@ -96,6 +96,7 @@ int main(int argc, char* argv[])
   map.push_back(line(sf::Vector2f(-5.0f, 5.0f), sf::Vector2f(5.0f, 5.0f)));
   map.push_back(line(sf::Vector2f(5.0f, 5.0f), sf::Vector2f(5.0f, -5.0f)));
   map.push_back(line(sf::Vector2f(5.0f, -5.0f), sf::Vector2f(-5.0f, -5.0f)));
+  map.push_back(line(sf::Vector2f(1.5f, 0.0f), sf::Vector2f(-1.5f, 0.0f)));
 
   // Player Setup
   entity player(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(0.0f, 1.0f));

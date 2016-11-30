@@ -25,6 +25,9 @@
 #define RAYCAST_RESOLUTION_WIDTH (1920/6)
 #define RAYCAST_RESOLUTION_HEIGHT (1080/6)
 #define RAYCAST_TEXTURE_SIZE 64
+#define RAYCAST_ENTITY_WIDTH 0.06f
+#define RAYCAST_SPRITE_WIDTH 64
+#define RAYCAST_SPRITE_HEIGHT 72
 
 using namespace std;
 
@@ -55,6 +58,18 @@ struct entity {
   float euler_deg()
     {
       return RAD_TO_DEG*this->euler();
+    }
+};
+
+struct render_entity {
+  sf::Vector2f position;
+  sf::Image sprite;
+
+  render_entity(const sf::Vector2f start_position, const std::string &image_name):
+    position(start_position)
+    {
+      this->sprite.create(RAYCAST_SPRITE_WIDTH, RAYCAST_SPRITE_HEIGHT);
+      this->sprite.loadFromFile(image_name);
     }
 };
 
@@ -101,6 +116,11 @@ int main(int argc, char* argv[])
   sf::Image wall_texture;
   wall_texture.create(RAYCAST_TEXTURE_SIZE, RAYCAST_TEXTURE_SIZE);
   wall_texture.loadFromFile("/home/spenser/projects/game-off-2016/build/textures/greystone.png");
+  
+  // Entity Setup
+  vector<render_entity> entities;
+
+  entities.push_back(render_entity(sf::Vector2f(2.5f, 2.5f), "/home/spenser/projects/game-off-2016/build/chest.png"));
 
   // Player Setup
   entity player(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(0.0f, 1.0f));
@@ -249,7 +269,8 @@ int main(int argc, char* argv[])
       sf::Vector2f intersection;
       sf::Vector2f slice_target = RAYCAST_VIEWDISTANCE*normalize(plane_base + slice*slice_width*plane_direction);
       line slice_segment(player.position, player.position + slice_target);
-      
+
+      // Check walls
       for(auto& wall : map) {
 	if(findIntersection(slice_segment, wall, &intersection)) {
 	  float intersection_distance = sqrMagnitude(intersection - player.position);
@@ -281,6 +302,54 @@ int main(int argc, char* argv[])
 	  render_buffer[render_offset + 1] = pixel_color.g;
 	  render_buffer[render_offset + 2] = pixel_color.b;
 	  render_buffer[render_offset + 3] = pixel_color.a;
+	}
+      }
+
+      // Check entities
+      for(auto& thing : entities) {
+	sf::Vector2f thing_view_direction = slice_segment.second - slice_segment.first;
+	line thing_view_segment(thing.position, thing.position); // TODO: Use simple sprite width to make raycast gaurenteed
+
+	// Calculate thing view segment
+	thing_view_direction /= magnitude(thing_view_direction);
+	float flip_y = -thing_view_direction.y;
+	thing_view_direction.y = thing_view_direction.x;
+	thing_view_direction.x = flip_y;
+	thing_view_segment.first -= RAYCAST_ENTITY_WIDTH*thing_view_direction;
+	thing_view_segment.second += RAYCAST_ENTITY_WIDTH*thing_view_direction;
+	
+	if(findIntersection(slice_segment, thing_view_segment, &intersection)) {
+	  if(sqrMagnitude(intersection - player.position) > 0.0f) {
+	    float distance = magnitude(intersection - player.position);
+	    float distance_scaling = 0.001f;
+	    float height = RAYCAST_SPRITE_HEIGHT; //RAYCAST_ENTITY_WIDTH*((float)RAYCAST_SPRITE_HEIGHT/RAYCAST_SPRITE_WIDTH);
+	    float thing_textel_u = magnitude(intersection - thing_view_segment.first)/magnitude(thing_view_segment.second - thing_view_segment.first);
+	    
+	    if(distance > 0.0f) {
+	      distance_scaling = 1/distance;
+	    }
+
+	    height *= distance_scaling;
+	    
+	    // Calculate slice height strips
+	    int start = (int)(-height/2.0f + RAYCAST_RESOLUTION_HEIGHT/2.0f);
+	    int end = (int)(height/2.0f + RAYCAST_RESOLUTION_HEIGHT/2.0f);
+	    
+	    // Blit sprite into render buffer
+	    for(int slice_y = start < 0 ? 0 : start; slice_y < (end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT - 1 : end); ++ slice_y) {
+	      int render_offset = RAYCAST_RESOLUTION_WIDTH*4*slice_y + 4*slice;
+	      float thing_textel_v = (slice_y - start)/height;
+	      sf::Color pixel_color = thing.sprite.getPixel(thing_textel_u*RAYCAST_SPRITE_WIDTH, thing_textel_v*RAYCAST_SPRITE_HEIGHT);
+
+	      if(pixel_color.a > 0) {
+		// Draw pixel
+		render_buffer[render_offset + 0] = pixel_color.r;
+		render_buffer[render_offset + 1] = pixel_color.g;
+		render_buffer[render_offset + 2] = pixel_color.b;
+		render_buffer[render_offset + 3] = pixel_color.a;
+	      }
+	    }
+	  }
 	}
       }
     }

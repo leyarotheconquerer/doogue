@@ -288,7 +288,16 @@ int main(int argc, char* argv[])
 
       // Check entities
       for(auto& thing : entities) {
+	sf::Vector2f thing_view_direction = slice_segment.second - slice_segment.first;
 	line thing_view_segment(thing.position, thing.position); // TODO: Use simple sprite width to make raycast gaurenteed
+
+	// Calculate thing view segment
+	thing_view_direction /= magnitude(thing_view_direction);
+	float flip_y = -thing_view_direction.y;
+	thing_view_direction.y = thing_view_direction.x;
+	thing_view_direction.x = flip_y;
+	thing_view_segment.first -= 0.3f*thing_view_direction;
+	thing_view_segment.second += 0.3f*thing_view_direction;
 	
 	if(findIntersection(slice_segment, thing_view_segment, &intersection)) {
 	  if(sqrMagnitude(intersection - player.position) > 0.0f) {

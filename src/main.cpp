@@ -24,6 +24,7 @@
 #define RAYCAST_VIEWDISTANCE 25.0f
 #define RAYCAST_RESOLUTION_WIDTH (1920/6)
 #define RAYCAST_RESOLUTION_HEIGHT (1080/6)
+#define RAYCAST_ENTITY_WIDTH 0.06f
 #define RAYCAST_SPRITE_WIDTH 64
 #define RAYCAST_SPRITE_HEIGHT 72
 
@@ -296,30 +297,33 @@ int main(int argc, char* argv[])
 	float flip_y = -thing_view_direction.y;
 	thing_view_direction.y = thing_view_direction.x;
 	thing_view_direction.x = flip_y;
-	thing_view_segment.first -= 0.3f*thing_view_direction;
-	thing_view_segment.second += 0.3f*thing_view_direction;
+	thing_view_segment.first -= RAYCAST_ENTITY_WIDTH*thing_view_direction;
+	thing_view_segment.second += RAYCAST_ENTITY_WIDTH*thing_view_direction;
 	
 	if(findIntersection(slice_segment, thing_view_segment, &intersection)) {
 	  if(sqrMagnitude(intersection - player.position) > 0.0f) {
 	    float distance = magnitude(intersection - player.position);
 	    float distance_scaling = 0.001f;
-
+	    float height = RAYCAST_SPRITE_HEIGHT; //RAYCAST_ENTITY_WIDTH*((float)RAYCAST_SPRITE_HEIGHT/RAYCAST_SPRITE_WIDTH);
+	    float thing_textel_u = magnitude(intersection - thing_view_segment.first)/magnitude(thing_view_segment.second - thing_view_segment.first);
+	    
 	    if(distance > 0.0f) {
 	      distance_scaling = 1/distance;
 	    }
 
-	    // TODO: Bound sprite anchor/offset draw calls
-	    sf::Vector2i sprite_anchor((int)(slice - (distance_scaling*RAYCAST_SPRITE_WIDTH)/2.0f), (int)(WINDOW_RESOLUTION_HEIGHT/2 - (distance_scaling*RAYCAST_SPRITE_HEIGHT)/2.0f));
-
-	    cout << "We got one: " << sprite_anchor.x << ", " << sprite_anchor.y << endl;
+	    height *= distance_scaling;
+	    
+	    // Calculate slice height strips
+	    int start = (int)(-height/2.0f + RAYCAST_RESOLUTION_HEIGHT/2.0f);
+	    int end = (int)(height/2.0f + RAYCAST_RESOLUTION_HEIGHT/2.0f);
 	    
 	    // Blit sprite into render buffer
-	    // TODO: Skip out of bounds pixels
-	    for(int blit_x = sprite_anchor.x; blit_x < sprite_anchor.x + distance_scaling*RAYCAST_SPRITE_WIDTH && blit_x < RAYCAST_RESOLUTION_WIDTH; ++blit_x) {
-	      for(int blit_y = sprite_anchor.y; blit_y < sprite_anchor.y + distance_scaling*RAYCAST_SPRITE_HEIGHT && blit_y < RAYCAST_RESOLUTION_HEIGHT; ++blit_y) {
-		int render_offset = RAYCAST_RESOLUTION_WIDTH*4*blit_y + 4*blit_x;
-		sf::Color pixel_color = thing.sprite.getPixel(blit_x - (int)sprite_anchor.x, blit_y - (int)sprite_anchor.y);
+	    for(int slice_y = start < 0 ? 0 : start; slice_y < (end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT - 1 : end); ++ slice_y) {
+	      int render_offset = RAYCAST_RESOLUTION_WIDTH*4*slice_y + 4*slice;
+	      float thing_textel_v = (slice_y - start)/height;
+	      sf::Color pixel_color = thing.sprite.getPixel(thing_textel_u*RAYCAST_SPRITE_WIDTH, thing_textel_v*RAYCAST_SPRITE_HEIGHT);
 
+	      if(pixel_color.a > 0) {
 		// Draw pixel
 		render_buffer[render_offset + 0] = pixel_color.r;
 		render_buffer[render_offset + 1] = pixel_color.g;

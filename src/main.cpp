@@ -351,7 +351,7 @@ int main(int argc, char* argv[])
 	    int end = (int)(height/2.0f + RAYCAST_RESOLUTION_HEIGHT/2.0f);
 	    
 	    // Blit sprite into render buffer
-	    for(int slice_y = start < 0 ? 0 : start; slice_y < (end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT - 1 : end); ++ slice_y) {
+	    for(int slice_y = start < 0 ? 0 : start; slice_y < (end >= RAYCAST_RESOLUTION_HEIGHT ? RAYCAST_RESOLUTION_HEIGHT : end); ++ slice_y) {
 	      
 	      int render_offset = RAYCAST_RESOLUTION_WIDTH*4*slice_y + 4*slice;
 	      float thing_textel_v = (slice_y - start)/height;

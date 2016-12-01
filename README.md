@@ -17,16 +17,5 @@ Ideas thrown into the pool as the core gets made
 
 # Original Readme
 You can find the original readme and information about the game off at the forked repository below!
+
 [doogue - Game Off 2016](https://github.com/dreac0nic/game-off-2016)
-
-## Other Information
-Here are some other information pages for game off 2016
-
-[game-off-repo]:        https://github.com/github/game-off-2016/
-[game-off-repo-issues]: https://github.com/github/game-off-2016/issues
-[git-documentation]:    https://git-scm.com/documentation
-[github-help]:          https://help.github.com/
-[github-signup]:        https://github.com/signup/free  
-[github-signup-org]:    https://github.com/organizations/new
-[github-support]:       https://github.com/contact?form%5Bsubject%5D=GitHub%20Game%20Off
-[wufoo-form]:           https://gameoff.wufoo.com/forms/game-off-2016/

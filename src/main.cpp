@@ -120,12 +120,12 @@ int main(int argc, char* argv[])
   // Wall Textures
   sf::Image wall_texture;
   wall_texture.create(RAYCAST_TEXTURE_SIZE, RAYCAST_TEXTURE_SIZE);
-  wall_texture.loadFromFile("/home/spenser/projects/game-off-2016/build/textures/greystone.png");
+  wall_texture.loadFromFile("/home/spenser/projects/doogue/build/textures/greystone.png");
   
   // Entity Setup
   vector<render_entity> entities;
 
-  entities.push_back(render_entity(sf::Vector2f(1.6f, 0.25f), "/home/spenser/projects/game-off-2016/build/chest.png"));
+  entities.push_back(render_entity(sf::Vector2f(1.6f, 0.25f), "/home/spenser/projects/doogue/build/chest.png"));
 
   // Player Setup
   entity player(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(0.0f, 1.0f));

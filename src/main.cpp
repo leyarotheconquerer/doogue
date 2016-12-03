@@ -308,7 +308,7 @@ int main(int argc, char* argv[])
 
 	  if(local_depth < render_depth[RAYCAST_RESOLUTION_WIDTH*slice_y + slice] && pixel_color.a > 0) { // XXX: Dirty transparency fix
 	    // Draw pixel
-	    // TODO: Appropriately redner pixel transparency
+	    // TODO: Appropriately render pixel transparency
 	    render_buffer[render_offset + 0] = pixel_color.r;
 	    render_buffer[render_offset + 1] = pixel_color.g;
 	    render_buffer[render_offset + 2] = pixel_color.b;
@@ -323,7 +323,7 @@ int main(int argc, char* argv[])
       // Check entities
       for(auto& thing : entities) {
 	sf::Vector2f thing_view_direction = slice_segment.second - slice_segment.first;
-	line thing_view_segment(thing.position, thing.position); // TODO: Use simple sprite width to make raycast gaurenteed
+	line thing_view_segment(thing.position, thing.position); // TODO: Use simple sprite width to make raycast guaranteed
 
 	// Calculate thing view segment
 	thing_view_direction /= magnitude(thing_view_direction);
